@@ -20,7 +20,7 @@ const config: runtime.GetPrismaClientConfig = {
   "clientVersion": "7.9.1",
   "engineVersion": "e922089b7d7502aff4249d5da3420f6fa55fc6ad",
   "activeProvider": "postgresql",
-  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../../models/tracking\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Shipment {\n  shipmentId     String   @id @db.Uuid\n  carrier        String?  @db.Text\n  consignmentId  String?  @db.Text\n  isDelivered    Boolean  @default(false) @db.Boolean\n  notifiedEvents String[]\n  connectionId   String   @db.Uuid\n  accountId      String   @db.Uuid\n  tenantId       String   @db.Uuid\n  data           Json?\n  createdAt      DateTime @default(now()) @db.Timestamptz(6)\n  updatedAt      DateTime @updatedAt\n\n  trackingEvents TrackingEvent[]\n\n  @@unique([shipmentId])\n}\n\nmodel TrackingEvent {\n  id              String   @id @default(dbgenerated(\"gen_random_uuid()\")) @db.Uuid\n  location        String   @db.Text\n  packageRef      String?  @db.Text\n  consignment     String?  @db.Text\n  trackingEventId String   @db.Uuid\n  createdAt       DateTime @default(now()) @db.Timestamptz()\n  updatedAt       DateTime @updatedAt\n  tenantId        String   @db.Uuid\n\n  shipmentId String   @db.Uuid\n  Shipment   Shipment @relation(fields: [shipmentId], references: [shipmentId], onDelete: Cascade)\n}\n",
+  "inlineSchema": "generator client {\n  provider     = \"prisma-client\"\n  output       = \"../../models/tracking\"\n  moduleFormat = \"cjs\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Shipment {\n  shipmentId     String   @id @db.Uuid\n  carrier        String?  @db.Text\n  consignmentId  String?  @db.Text\n  isDelivered    Boolean  @default(false) @db.Boolean\n  notifiedEvents String[]\n  connectionId   String   @db.Uuid\n  accountId      String   @db.Uuid\n  tenantId       String   @db.Uuid\n  data           Json?\n  createdAt      DateTime @default(now()) @db.Timestamptz(6)\n  updatedAt      DateTime @updatedAt\n\n  trackingEvents TrackingEvent[]\n\n  @@unique([shipmentId])\n}\n\nmodel TrackingEvent {\n  id              String   @id @default(dbgenerated(\"gen_random_uuid()\")) @db.Uuid\n  location        String   @db.Text\n  packageRef      String?  @db.Text\n  consignment     String?  @db.Text\n  trackingEventId String   @db.Uuid\n  createdAt       DateTime @default(now()) @db.Timestamptz()\n  updatedAt       DateTime @updatedAt\n  tenantId        String   @db.Uuid\n\n  shipmentId String   @db.Uuid\n  Shipment   Shipment @relation(fields: [shipmentId], references: [shipmentId], onDelete: Cascade)\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -45,10 +45,10 @@ async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Modul
 }
 
 config.compilerWasm = {
-  getRuntime: async () => await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.mjs"),
+  getRuntime: async () => await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.js"),
 
   getQueryCompilerWasmModule: async () => {
-    const { wasm } = await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.wasm-base64.mjs")
+    const { wasm } = await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.wasm-base64.js")
     return await decodeBase64AsWasm(wasm)
   },
 

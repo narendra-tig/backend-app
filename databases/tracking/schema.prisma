@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../../models/tracking"
+  provider     = "prisma-client"
+  output       = "../../models/tracking"
+  moduleFormat = "cjs"
 }
 
 datasource db {
