@@ -19,6 +19,15 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "plugins": [
+      { "transform": "typia/lib/transform", "enabled": false },
+      {
+        "transform": "@nestia/core/native/transform.cjs",
+        "validate": "validatePrune",
+        "stringify": "validate.log",
+        "llm": { "strict": true }
+      }
+    ]
   }
 }
