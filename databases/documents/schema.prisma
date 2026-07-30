@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../../models/documents"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+enum ResourceType {
+  SHIPMENT
+  MANIFEST
+  POD
+  LABEL
+  RATE_CARD_SELL
+  RATE_CARD_BUY
+  TERMS_AND_CONDITIONS_ACCOUNT
+  TERMS_AND_CONDITIONS_TENANCY
+  TERMS_AND_CONDITIONS_GLOBAL
+  TERMS_AND_CONDITIONS_CUSTOMER_GROUP
+  ZONES
+  REPORT
+  ZONE_CARD
+  SURCHARGE_SELL
+  SURCHARGE_BUY
+  FUEL_LEVY_SELL
+  FUEL_LEVY_BUY
+  ZONE_ETA
+  INVOICE
+  CUSTOM
+  OTHER
+  ACCOUNT_LOGO
+  ACCOUNT_ICON
+  ACCOUNTS
+  DANGEROUS_GOODS
+  TENANCY
+  TENANCY_LOGO
+  TENANCY_ICON
+  USER_PROFILE_PICTURE
+  BULK_IMPORT
+  RATE_CARD_DOWNLOAD
+  SUPPLIER_OFFLINE_ATTACHMENT
+  DEPOT_OFFLINE_ATTACHMENT
+  RECONCILIATION
+}
+
+model DocumentConnection {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId        String        @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  accountId       String?
+  shipmentId      String?
+  manifestId      String?
+  mimeType        String?
+  fileName        String
+  customerGroupId String?
+  resourceType    ResourceType?
+  storageUrl      String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  DocumentStorage DocumentStorage? @relation(fields: [id], references: [id])
+}
+
+model DocumentStorage {
+  id                 String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  path               String
+  tenantId           String               @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  mimeType           String?
+  fileName           String               @unique
+  resourceType       ResourceType?
+  storageUrl         String?
+  repository         String?
+  isPublic           Boolean              @default(false)
+  isShared           Boolean              @default(false)
+  downloadCount      Int                  @default(0)
+  userId             String?
+  accountId          String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  key                String?
+  DocumentConnection DocumentConnection[]
+}
+
+enum DocumentType {
+  LABEL_PDF
+  LABEL_ZPL
+  REPORT_PDF
+  POD_PDF
+  LABEL_ZPL_DEFAULT
+  DG_PDF
+}
+
+model Document {
+  id         String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  shipmentId String
+  tenantId   String       @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  accountId  String
+  type       DocumentType
+  data       String
+}

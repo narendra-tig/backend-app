@@ -1,0 +1,70 @@
+enum RoleType {
+    TENANCY
+    ACCOUNT
+}
+
+enum PermissionType {
+    TENANCY
+    ACCOUNT
+    HUB
+}
+
+model Connection {
+    id                   String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    userId               String                @db.Uuid
+    organisationalUnitId String                @db.Uuid
+    tenantId             String                @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+    appName              String? // Application name for the connection
+    appModuleType        ConnectionModuleType?
+    appModuleId          String? // Module ID for the connection
+    createdAt            DateTime              @default(now()) @db.Timestamptz()
+    updatedAt            DateTime              @updatedAt
+    accountId            String?               @db.Uuid
+    isDefault            Boolean               @default(false)
+    customerGroupId      String?               @db.Uuid
+    defaultModule        String? // Default module for the connection
+
+    roles       Role[]
+    permissions Permission[]
+
+    @@unique(fields: [userId, organisationalUnitId], name: "userOrganisationalUnitId")
+    @@index([userId], name: "idx_connection_userId")
+    @@index([tenantId, userId], name: "idx_connection_tenantId_userId")
+    @@index([tenantId, userId, organisationalUnitId], name: "idx_connection_tenantId_userId_organisationalUnitId")
+    @@index([tenantId, appModuleType])
+    @@index([organisationalUnitId])
+}
+
+model Role {
+    id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    name        String
+    description String?
+    type        RoleType
+    accountId   String?  @db.Uuid
+    tenantId    String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+    createdAt   DateTime @default(now()) @db.Timestamptz()
+    updatedAt   DateTime @updatedAt
+
+    permissions Permission[]
+    connections Connection[]
+}
+
+model Permission {
+    name String @id
+
+    type                PermissionType[]
+    roles               Role[]
+    connections         Connection[]
+    organisationalUnits OrganisationalUnit[]
+}
+
+model Namespace {
+    name String @id
+}
+
+model NamespacesData {
+    id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    data Json
+
+    @@index([data], type: Hash)
+}

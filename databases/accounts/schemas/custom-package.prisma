@@ -1,0 +1,44 @@
+model CustomPackage {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name             String
+  reference        String?
+  type             String?
+  quantity         Int?
+  length           Float?
+  width            Float?
+  height           Float?
+  weight           Float?
+  isDangerousGoods Boolean?
+  ofAccountId      String?  @db.Uuid
+  ofPackageId      String?  @db.Uuid
+  labelQuantity    Int?     @default(1)
+  carrierId        String?
+  serviceId        String?
+
+  tenantId  String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  accountId String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+
+  account               Account                 @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  customPackageContents CustomPackageContents[]
+
+  @@index([tenantId, accountId], map: "idx_custom_package_tenant_account_id")
+}
+
+model CustomPackageContents {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reference   String?
+  packageType String?
+  quantity    Int?
+  weight      Decimal?
+  dgType      String?
+  dgId        String?
+  createdAt   DateTime @default(now()) @db.Timestamptz()
+  updatedAt   DateTime @default(now()) @updatedAt
+  tenantId    String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  packageId      String          @db.Uuid
+  package        CustomPackage   @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  dangerousGoods DangerousGoods? @relation(fields: [dgId], references: [id])
+}

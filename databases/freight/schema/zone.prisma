@@ -1,0 +1,81 @@
+model ZoneETACard {
+  id                     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  displayName            String
+  start                  DateTime
+  end                    DateTime?
+  createdAt              DateTime  @default(now()) @db.Timestamptz()
+  updatedAt              DateTime  @updatedAt
+  masterCarrierId        String    @db.Uuid
+  masterCarrierServiceId String?   @db.Uuid
+
+  zoneETAs      ZoneETA[]
+  masterCarrier MasterCarrier @relation(fields: [masterCarrierId], references: [id], onDelete: Cascade)
+
+  @@index([masterCarrierId, start, end], name: "zone_eta_card_carrier_date_range_index")
+  @@index([masterCarrierId, masterCarrierServiceId, start, end], name: "zone_eta_card_carrier_service_date_index")
+}
+
+model ZoneETA {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  service     String   @default("")
+  fromZone    String
+  toSuburb    String
+  toPostcode  String
+  toState     String
+  transitTime Int
+  country     String?
+  createdAt   DateTime @default(now()) @db.Timestamptz()
+  updatedAt   DateTime @updatedAt
+
+  zoneETACardId String      @db.Uuid
+  zoneETACard   ZoneETACard @relation(fields: [zoneETACardId], references: [id], onDelete: Cascade)
+
+  @@index([zoneETACardId, fromZone, toPostcode, toSuburb], name: "zone_eta_card_zone_lookup_index")
+  @@index([zoneETACardId, toPostcode], name: "zone_eta_cardId_toPostcode_index")
+  @@index([fromZone(ops: raw("gin_trgm_ops"))], type: Gin, name: "zone_eta_from_zone_trgm_index")
+  @@index([toSuburb(ops: raw("gin_trgm_ops"))], type: Gin, name: "zone_eta_to_suburb_trgm_index")
+}
+
+model ZoneCard {
+  id                     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code                   String?
+  codeIndex              Int       @default(autoincrement())
+  start                  DateTime
+  end                    DateTime?
+  displayName            String
+  createdAt              DateTime  @default(now()) @db.Timestamptz()
+  updatedAt              DateTime  @updatedAt
+  masterCarrierId        String    @db.Uuid
+  masterCarrierServiceId String?   @db.Uuid
+
+  zones         Zone[]
+  masterCarrier MasterCarrier @relation(fields: [masterCarrierId], references: [id], onDelete: Cascade)
+
+  @@index([id, masterCarrierId], name: "zone_card_id_master_carrier_id_index")
+  @@index([masterCarrierId], name: "zone_card_master_carrier_id_index")
+}
+
+model Zone {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  suburb          String
+  postCode        Int
+  state           String
+  zone            String
+  hub             String?
+  parentZone      String?
+  grandParentZone String?
+  newPostCode     String?
+  service         String?
+  country         String?
+  createdAt       DateTime @default(now()) @db.Timestamptz()
+  updatedAt       DateTime @updatedAt
+
+  zoneCardId String      @db.Uuid
+  zoneCard   ZoneCard    @relation(fields: [zoneCardId], references: [id], onDelete: Cascade)
+  surcharges Surcharge[]
+  fuelLevies FuelLevy[]
+
+  @@index([postCode, suburb], name: "zone_postcode_suburb_index")
+  @@index([postCode, suburb, zoneCardId], name: "zone_postcode_suburb_zoneCardId_index")
+  @@index([suburb(ops: raw("gin_trgm_ops"))], type: Gin, name: "zone_suburb_trgm_index")
+}

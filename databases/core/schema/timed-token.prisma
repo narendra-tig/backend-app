@@ -1,0 +1,18 @@
+enum TimedTokenType {
+  ROOT_USER_INVITATION
+  TENANCY_USER_INVITATION
+  ACCOUNT_USER_INVITATION
+  HUB_USER_INVITATION
+  RESET_PASSWORD
+}
+
+model TimedToken {
+  id         String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  token      String
+  type       TimedTokenType
+  userId     String         @db.Uuid
+  expiryTime DateTime
+  tenantId   String         @db.Uuid
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

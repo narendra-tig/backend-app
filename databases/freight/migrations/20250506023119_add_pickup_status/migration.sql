@@ -1,0 +1,5 @@
+-- CreateEnum
+CREATE TYPE "PickupStatus" AS ENUM ('CONFIRMED', 'PENDING', 'COMPLETED', 'CANCELLED', 'ERROR', 'SHIPPER', 'HELD', 'PROCESSING', 'REBOOKED', 'HIDDEN');
+
+-- AlterTable
+ALTER TABLE "Pickup" ADD COLUMN     "pickupStatus" "PickupStatus" NOT NULL DEFAULT 'CONFIRMED';

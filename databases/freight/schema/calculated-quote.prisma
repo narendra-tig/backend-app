@@ -1,0 +1,26 @@
+model CalculatedQuote {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  data              Json
+  accountId         String    @db.Uuid
+  customerGroupId   String    @db.Uuid
+  dispatchDate      DateTime? @db.Timestamptz
+  senderName        String?
+  senderAddress     String?
+  receiverName      String?
+  receiverAddress   String?
+  carrier           String?
+  serviceName       String?
+  estimatedPrice    Decimal?  @db.Money
+  eta               String?   @default("")
+  quoteReference    String?   @default("")
+  internalReference String?   @default("")
+  totalQuantity     Int?
+  totalWeight       Decimal?
+  totalVolume       Decimal?
+  tenantId          String    @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  createdAt         DateTime  @default(now()) @db.Timestamptz()
+  updatedAt         DateTime  @updatedAt @db.Timestamptz()
+  deleted           Boolean   @default(false)
+
+  @@index([accountId, customerGroupId, createdAt])
+}

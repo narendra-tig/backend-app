@@ -1,0 +1,65 @@
+enum ServiceAlgorithmType {
+  ALGORITHM
+  SERVICE
+}
+
+model ShipmentPreference {
+  id                              String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  serviceId                       String?              @db.Uuid
+  customerGroupCarrierId          String?              @db.Uuid
+  connectionId                    String?              @db.Uuid
+  defaultLocationId               String?              @db.Uuid
+  defaultSpecialInstructions      String?
+  serviceAlgorithm                String?
+  serviceAlgorithmType            ServiceAlgorithmType @default(ALGORITHM)
+  autoSaveAddressBookItem         Boolean              @default(false)
+  internalReferenceRequired       Boolean              @default(false)
+  shipmentReferenceRequired       Boolean              @default(false)
+  signatureRequired               Boolean              @default(false)
+  quoteReferenceRequired          Boolean              @default(false)
+  enableShippingNotifications     Boolean              @default(false)
+  enableConsignmentConsolidation  Boolean              @default(false)
+  costCentreRequired              Boolean              @default(false)
+  allowThirdPartyPays             Boolean              @default(false)
+  customerGroupId                 String               @db.Uuid
+  tenantId                        String               @db.Uuid
+  ofCustomerGroupCarrierId        String?              @db.Uuid
+  ofCustomerGroupServiceId        String?              @db.Uuid
+  createdAt                       DateTime             @default(now())
+  updatedAt                       DateTime             @default(now()) @updatedAt
+  defaultSender                   String?              @default("")
+  defaultService                  String?              @default("")
+  enableConsignmentCostWarning    Boolean              @default(false)
+  consignmentCostWarningThreshold Int?                 @default(0)
+  hidePricing                     Boolean?             @default(false)
+  enableRatesAndQuoting           Boolean?             @default(false)
+  closingTime                     String?              @default("")
+
+  @@unique([customerGroupId])
+  @@index([serviceId])
+  @@index([customerGroupCarrierId])
+  @@index([connectionId])
+  @@index([defaultLocationId])
+  @@index([customerGroupId])
+}
+
+model TenancyPreference {
+  id                         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  uniqueReference            Boolean? @default(false)
+  allowVolume                Boolean? @default(false)
+  allowThirdParty            Boolean? @default(false)
+  dimensionsRequired         Boolean? @default(false)
+  quoteInclusiveTax          Boolean? @default(false)
+  lowestShippingCostOnly     Boolean? @default(false)
+  calculateItemTotal         Boolean? @default(false)
+  receiverDefaultResidential Boolean? @default(false)
+  mandatoryFields            String[] @default([])
+  brandingTemplateId         String?  @db.Uuid
+
+  tenantId  String    @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  createdAt DateTime  @default(now()) @db.Timestamptz()
+  updatedAt DateTime  @default(now()) @updatedAt @db.Timestamptz()
+  deletedAt DateTime? @db.Timestamptz()
+
+  @@unique([tenantId])
+}

@@ -17,7 +17,13 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+
+    "accounts:generate": "prisma generate --config databases/accounts/prisma.config.ts",
+    "core:generate": "prisma generate --config databases/core/prisma.config.ts",
+    "documents:generate": "prisma generate --config databases/documents/prisma.config.ts",
+    "freight:generate": "prisma generate --config databases/freight/prisma.config.ts",
+    "tracking:generate": "prisma generate --config databases/tracking/prisma.config.ts"
   },
   "dependencies": {
     "@nestia/core": "^12.1.0",
@@ -42,6 +48,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.0",
     "@types/supertest": "^7.0.0",
+    "dotenv": "^17.4.2",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",

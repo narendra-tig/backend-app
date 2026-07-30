@@ -1,0 +1,2 @@
+-- This migration adds the pg_trgm extension to the PostgreSQL database and creates several indexes to optimize query performance for the Zone and ZoneETA tables.
+CREATE EXTENSION IF NOT EXISTS pg_trgm;

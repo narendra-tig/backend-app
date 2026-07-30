@@ -1,0 +1,26 @@
+model Tenant {
+  id                   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                 String   @unique
+  firebaseId           String
+  ownerId              String?  @db.Uuid
+  displayName          String
+  organisationalUnitId String?  @db.Uuid
+  createdAt            DateTime @default(now()) @db.Timestamptz()
+  updatedAt            DateTime @updatedAt
+
+  details                 TenantDetails?
+  organisationalUnits     OrganisationalUnit[]
+  organisationalUnitEdges OrganisationalUnitEdge[]
+  users                   User[]
+  AccessibilitySettings   AccessibilitySettings[]
+}
+
+model TenantDetails {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  bucketName String
+  tenantId   String   @unique @db.Uuid
+  createdAt  DateTime @default(now()) @db.Timestamptz()
+  updatedAt  DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}

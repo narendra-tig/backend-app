@@ -1,0 +1,58 @@
+enum ShipmentLegMode {
+  FIRST_MILE
+  LINEHAUL
+  LAST_MILE
+  AIR
+  SEA
+  RAIL
+}
+
+enum LegEventType {
+  PICKED_UP
+  IN_TRANSIT
+  AT_DEPOT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  EXCEPTION
+}
+
+model ShipmentLeg {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  shipmentId String @db.Uuid
+  tenantId   String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  fromLocationId String?         @db.Uuid
+  toLocationId   String?         @db.Uuid
+  mode           ShipmentLegMode
+  sequenceNumber Int             @default(1)
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+
+  shipment      Shipment     @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  fromLocation  Location?    @relation("LegFromLocation", fields: [fromLocationId], references: [id])
+  toLocation    Location?    @relation("LegToLocation", fields: [toLocationId], references: [id])
+  events        LegEvent[]
+  newShipment   NewShipment? @relation(fields: [newShipmentId], references: [id])
+  newShipmentId String?      @db.Uuid
+
+  @@index([shipmentId, sequenceNumber])
+}
+
+model LegEvent {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  legId    String @db.Uuid
+  tenantId String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  locationId String?      @db.Uuid
+  eventType  LegEventType
+  eventTime  DateTime     @db.Timestamptz()
+  notes      String?
+  misc       Json?
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+
+  leg ShipmentLeg @relation(fields: [legId], references: [id], onDelete: Cascade)
+
+  @@index([legId, eventTime])
+}

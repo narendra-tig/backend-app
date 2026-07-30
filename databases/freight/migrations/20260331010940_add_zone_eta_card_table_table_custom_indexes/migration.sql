@@ -1,0 +1,2 @@
+-- Create a conditional index on the ZoneETACard table to optimize queries that filter by masterCarrierId when masterCarrierServiceId is null.
+CREATE INDEX zone_eta_card_carrier_default ON "ZoneETACard" ("masterCarrierId") WHERE "masterCarrierServiceId" IS NULL;

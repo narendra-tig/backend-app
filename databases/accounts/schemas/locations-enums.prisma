@@ -1,0 +1,59 @@
+enum LocationType {
+  PICKUP          @map("pickup")
+  DELIVERY        @map("delivery")
+  WAREHOUSE       @map("warehouse")
+  DEPOT           @map("depot")
+  PORT            @map("port")
+  BORDER_CROSSING @map("border_crossing")
+  RAIL_TERMINAL   @map("rail_terminal")
+  AIRPORT         @map("airport")
+}
+
+enum TaxIdType {
+  ABN
+  EIN
+  VAT
+  GST
+  OTHER
+}
+
+enum ContactRole {
+  DISPATCH     @map("dispatch")
+  RECEIVING    @map("receiving")
+  GATEHOUSE    @map("gatehouse")
+  BILLING      @map("billing")
+  EMERGENCY    @map("emergency")
+  SITE_MANAGER @map("site_manager")
+}
+
+enum AccuracyLevel {
+  ROOFTOP     @map("rooftop")
+  STREET      @map("street")
+  APPROXIMATE @map("approximate")
+}
+
+enum GeofenceType {
+  POLYGON @map("polygon")
+  RADIUS  @map("radius")
+  NONE    @map("none")
+}
+
+enum SurfaceType {
+  PAVED  @map("paved")
+  GRAVEL @map("gravel")
+  DIRT   @map("dirt")
+}
+
+enum VerificationSource {
+  G_NAF     @map("g_naf")
+  CORELOGIC @map("corelogic")
+  GOOGLE    @map("google")
+  MANUAL    @map("manual")
+}
+
+enum VerificationLevel {
+  PARCEL       @map("parcel")
+  ROOFTOP      @map("rooftop")
+  STREET_RANGE @map("street_range")
+  LOCALITY     @map("locality")
+}

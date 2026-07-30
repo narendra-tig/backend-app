@@ -1,0 +1,95 @@
+enum CustomerGroupBillingStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum BillingGroupType {
+  ACCOUNT
+  SELF
+  GROUP
+}
+
+enum TradingTermsType {
+  END_OF_MONTH
+  INVOICE_DATE
+  PREPAID
+}
+
+enum InvoiceCycle {
+  WEEKLY
+  FORTNIGHTLY
+  MONTHLY
+}
+
+model BillingProfile {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  abn        String
+  acn        String
+  isBilledTo Boolean? @default(false)
+  tenantId   String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  accountId  String   @db.Uuid
+  createdAt  DateTime @default(now()) @db.Timestamptz()
+  updatedAt  DateTime @updatedAt
+
+  account        Account                  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  customerGroups CustomerGroup[]
+  invoices       BillingInvoiceReceiver[]
+}
+
+model BillingInvoiceReceiver {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email     String
+  tenantId  String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  accountId String   @db.Uuid
+  billingId String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+
+  billing BillingProfile @relation(fields: [billingId], references: [id], onDelete: Cascade)
+}
+
+model Invoices {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  accountId           String   @db.Uuid
+  customerGroupId     String   @db.Uuid
+  invoiceNumber       String   @unique
+  parentInvoiceNumber String?
+  tenantId            String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  invoiceAmount       Decimal  @db.Decimal(10, 2)
+  gstInvoiceAmount    Decimal  @db.Decimal(10, 2)
+  invoiceDate         DateTime @db.Timestamptz()
+  csvFileName         String?
+  csvFileURL          String?
+  pdfFileName         String?
+  pdfFileURL          String?
+  createdAt           DateTime @default(now()) @db.Timestamptz()
+  updatedAt           DateTime @updatedAt
+
+  customerGroup CustomerGroup @relation(fields: [customerGroupId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, customerGroupId], map: "idx_invoices_tenant_customer_group_id")
+}
+
+model CustomerGroupBilling {
+  id                     String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customerGroupId        String                     @unique @db.Uuid
+  accountId              String                     @db.Uuid
+  tenantId               String                     @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  billingCode            Int
+  status                 CustomerGroupBillingStatus
+  billingGroupType       BillingGroupType
+  billingCustomerGroupId String?                    @db.Uuid
+  tradingTermsDays       Int?
+  tradingTermsType       TradingTermsType?
+  invoiceCycle           InvoiceCycle?
+  businessName           String?
+  abn                    String?
+  acn                    String?
+  myobName               String?
+  invoiceEmails          String[]
+  createdAt              DateTime                   @default(now()) @db.Timestamptz()
+  updatedAt              DateTime                   @updatedAt
+
+  customerGroup CustomerGroup @relation(fields: [customerGroupId], references: [id], onDelete: Cascade)
+}

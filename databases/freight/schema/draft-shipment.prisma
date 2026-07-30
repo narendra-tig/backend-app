@@ -1,0 +1,36 @@
+model DraftShipment {
+  id                      String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  data                    Json
+  accountId               String          @db.Uuid
+  customerGroupId         String          @db.Uuid
+  dispatchDate            DateTime?       @db.Timestamptz
+  senderName              String?
+  senderAddress           String?
+  senderCountry           String?         @default("")
+  senderState             String?         @default("")
+  senderSuburb            String?         @default("")
+  senderPostcode          String?         @default("")
+  receiverName            String?
+  receiverAddress         String?
+  receiverState           String?         @default("")
+  receiverPostcode        String?         @default("")
+  receiverCountry         String?         @default("")
+  receiverSuburb          String?         @default("")
+  carrier                 String?
+  serviceName             String?
+  estimatedPrice          Decimal?        @db.Money
+  shipmentReferenceId     String?
+  status                  ShipmentStatus?
+  tenantId                String          @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  createdAt               DateTime        @default(now()) @db.Timestamptz()
+  eta                     String?         @default("")
+  internalReference       String?         @default("")
+  consignmentReference    String?         @default("")
+  totalQuantity           Int?
+  totalWeight             Decimal?
+  totalVolume             Decimal?
+  thirdPartyAccountNumber String?         @default("")
+  deleted                 Boolean         @default(false)
+
+  @@unique([shipmentReferenceId])
+}

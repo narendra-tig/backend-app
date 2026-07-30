@@ -1,0 +1,173 @@
+enum AttachmentType {
+  LABEL
+  INVOICE
+  POD
+  PICKUP_CONFIRMATION
+  CUSTOMS_DECLARATION
+  COMMERCIAL_INVOICE
+  OTHER
+}
+
+enum AddressValidationStatus {
+  VALID
+  INVALID
+  UNVALIDATED
+  PARTIAL
+}
+
+enum AddressValidationLevel {
+  ADDRESS
+  SUBURB
+  POSTCODE
+  STATE
+  COUNTRY
+}
+
+enum NotificationChannel {
+  EMAIL
+  SMS
+  WEBHOOK
+  PUSH
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+  BOUNCED
+}
+
+model ShipmentAttachment {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  shipmentId String @db.Uuid
+  tenantId   String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  type             AttachmentType
+  filename         String
+  mimeType         String?
+  size             BigInt?
+  storageReference String
+
+  uploadedAt DateTime @default(now()) @db.Timestamptz()
+  uploadedBy String?  @db.Uuid
+
+  shipment NewShipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([type])
+}
+
+model AddressValidation {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  addressId String @unique @db.Uuid
+  tenantId  String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  status          AddressValidationStatus @default(UNVALIDATED)
+  level           AddressValidationLevel?
+  source          String?
+  sourceReference String?
+  errors          String[]                @default([])
+
+  validatedAt DateTime? @db.Timestamptz()
+  createdAt   DateTime  @default(now()) @db.Timestamptz()
+  updatedAt   DateTime  @updatedAt
+
+  address Address @relation(fields: [addressId], references: [id], onDelete: Cascade)
+}
+
+model ShipmentAttribute {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  shipmentId String @db.Uuid
+  tenantId   String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  key   String
+  value String
+  type  String @default("string")
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+
+  shipment NewShipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@unique([shipmentId, key])
+  @@index([key, value])
+}
+
+model ShipmentIntegration {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  shipmentId String @unique @db.Uuid
+  tenantId   String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  carrierRateCalculation Json?
+  carrierBookingRequest  Json?
+  carrierBookingResponse Json?
+  carrierTrackingData    Json?
+  misc                   Json?
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+
+  shipment NewShipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+}
+
+model ShipmentNotification {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  shipmentId String @db.Uuid
+  tenantId   String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  channel           NotificationChannel
+  provider          String?
+  providerEventId   String?
+  providerMessageId String?
+
+  templateId String?
+  recipient  String
+  status     NotificationStatus
+
+  sentAt      DateTime? @db.Timestamptz()
+  deliveredAt DateTime? @db.Timestamptz()
+  failedAt    DateTime? @db.Timestamptz()
+  error       String?
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+
+  shipment NewShipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([shipmentId, status])
+  @@index([recipient])
+}
+
+model ShipmentMeta {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  shipmentId String @unique @db.Uuid
+  tenantId   String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  schemaVersion  String? // e.g., "2.1.0"
+  sourceSystem   String? // e.g., "OPEN360", "ERP_SYSTEM"
+  sourceChannel  String? // e.g., "API", "WEB", "IMPORT"
+  idempotencyKey String? @unique
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+
+  shipment NewShipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+}
+
+model ShipmentStatusHistory {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  shipmentId String @db.Uuid
+  tenantId   String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  status    ShipmentStatus
+  changedAt DateTime       @db.Timestamptz()
+  changedBy String? // "user:101" or "system"
+  notes     String?
+  misc      Json? // Additional context
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+
+  shipment NewShipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([shipmentId, changedAt])
+}

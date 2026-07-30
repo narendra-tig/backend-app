@@ -1,0 +1,5 @@
+enum ReceiverBillTo {
+  NONE
+  RECEIVER_PAYS
+  THIRD_PARTY_ACCT
+}

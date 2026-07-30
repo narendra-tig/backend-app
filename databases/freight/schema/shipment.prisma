@@ -1,0 +1,389 @@
+enum ShipmentStatus {
+  DRAFT
+  READY_TO_SHIP
+  MANIFESTED
+  HELD
+  CANCELLED
+  DELIVERED
+  RETURNED
+  RETURN
+  IN_TRANSIT
+  UPDATED
+  CREATED
+}
+
+enum SignaturePreference {
+  SIGNATURE_REQUIRED
+  AUTHORITY_TO_LEAVE
+}
+
+model Shipment {
+  id                   String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reference            String?
+  senderId             String              @db.Uuid
+  receiverId           String              @db.Uuid
+  dispatchDate         DateTime            @db.Timestamptz
+  signaturePreference  SignaturePreference
+  billTo               String
+  carrier              String
+  serviceName          String              @default("")
+  serviceId            String              @default(dbgenerated("'00000000-0000-0000-0000-000000000000'::uuid")) @db.Uuid
+  connectionId         String              @default(dbgenerated("'00000000-0000-0000-0000-000000000000'::uuid")) @db.Uuid
+  pickupInstructions   String?
+  deliveryInstructions String?
+  customReference      String?
+  status               ShipmentStatus
+  pickupId             String?             @db.Uuid
+  createdAt            DateTime            @default(now()) @db.Timestamptz()
+  tenantId             String              @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  accountId            String              @db.Uuid
+  customerGroupId      String              @db.Uuid
+  shipmentReferenceId  String?
+  minBusinessDays      Int?
+  maxBusinessDays      Int?
+  estimatedPrice       Decimal?            @db.Money
+  updatedAt            DateTime            @default(now()) @updatedAt
+  deleted              Boolean             @default(false)
+  manifestId           String?             @db.Uuid
+  consignmentReference String?
+  internalReference    String?
+  returnCode           String?
+
+  packages          Package[]
+  palletsManagement PalletsManagement?
+  paperwork         Paperwork[]
+  pickup            Pickup?
+  details           ShipmentDetails?
+  sender            Sender             @relation(fields: [senderId], references: [id])
+  receiver          Receiver?          @relation(fields: [receiverId], references: [id])
+  manifestShipment  ManifestShipment?  @relation(fields: [manifestId], references: [id])
+  watchlists        Watchlist[]
+  shipmentLegs      ShipmentLeg[]
+  shipmentPricings  ShipmentPricing[]
+  shipmentTracking  ShipmentTracking?
+
+  @@unique([shipmentReferenceId])
+}
+
+model Package {
+  id            String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String?
+  packageType   String
+  quantity      Int
+  weight        Decimal
+  length        Decimal
+  width         Decimal
+  height        Decimal
+  reference     String?
+  volume        Decimal?
+  labelQuantity Int          @default(1)
+  isEnablePrint Boolean?     @default(true)
+  createdAt     DateTime     @default(now()) @db.Timestamptz()
+  tenantId      String       @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  number        String?
+  barcode       String?
+  shipmentId    String?      @db.Uuid
+  newShipmentId String?      @db.Uuid
+  shipment      Shipment?    @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  newShipment   NewShipment? @relation(fields: [newShipmentId], references: [id], onDelete: Cascade)
+
+  international   PackageInternational?
+  packageContents PackageContents[]
+
+  @@index([number])
+  @@index([barcode])
+}
+
+model PackageContents {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reference   String?
+  packageType String?
+  quantity    Int?
+  weight      Decimal?
+  dgType      String?
+  dgId        String?
+  createdAt   DateTime @default(now()) @db.Timestamptz()
+  updatedAt   DateTime @default(now()) @updatedAt
+  tenantId    String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  contentType String?
+  value       Decimal?
+  packageId   String   @db.Uuid
+
+  package        Package               @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  dangerousGoods DangerousGoods?
+  international  ContentInternational?
+}
+
+model PalletsManagement {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  accountNumber String?
+  chep          Int
+  loscam        Int
+  other         Int
+  createdAt     DateTime @default(now()) @db.Timestamptz()
+  tenantId      String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  chepIn              Int     @default(0)
+  chepOut             Int     @default(0)
+  loscamIn            Int     @default(0)
+  loscamOut           Int     @default(0)
+  otherIn             Int     @default(0)
+  otherOut            Int     @default(0)
+  chepAccountNumber   String?
+  loscamAccountNumber String?
+  otherPalletDetails  String?
+
+  shipmentId    String?      @db.Uuid
+  newShipmentId String?      @db.Uuid
+  shipment      Shipment?    @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  newShipment   NewShipment? @relation(fields: [newShipmentId], references: [id], onDelete: Cascade)
+
+  @@unique([shipmentId])
+  @@unique([newShipmentId])
+}
+
+model Paperwork {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fileName        String
+  size            BigInt
+  reference       String
+  tag             String
+  createdAt       DateTime @default(now()) @db.Timestamptz()
+  lastPrintedDate DateTime @default(now()) @updatedAt
+  tenantId        String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  shipmentId    String?      @db.Uuid
+  newShipmentId String?      @db.Uuid
+  shipment      Shipment?    @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  newShipment   NewShipment? @relation(fields: [newShipmentId], references: [id], onDelete: Cascade)
+}
+
+model ShipmentDetails {
+  id                          String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  dispatchDate                String
+  deliverySignaturePreference SignaturePreference
+  billTo                      String
+  carrier                     String
+  serviceName                 String              @default("")
+  serviceId                   String              @default(dbgenerated("'00000000-0000-0000-0000-000000000000'::uuid")) @db.Uuid
+  connectionId                String              @default(dbgenerated("'00000000-0000-0000-0000-000000000000'::uuid")) @db.Uuid
+  specialServices             String[]
+  pickupInstructions          String?
+  deliveryInstructions        String?
+  customReference             String?
+  consignmentReference        String?
+  internalReference           String?
+  eta                         String?             @default("")
+  thirdPartyAccountNumber     String?
+  billToCustomerGroupId       String?
+  totalVolume                 Decimal?
+  totalWeight                 Decimal?
+  totalQuantity               Int?
+  enableItemAsTotal           Boolean?            @default(false)
+  isReturnEmailSent           Boolean?
+  isReturnConfirmed           Boolean?            @default(false)
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  tenantId  String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  updatedAt DateTime @default(now()) @updatedAt
+
+  shipmentId         String                         @db.Uuid
+  shipment           Shipment                       @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  newSpecialServices ShipmentDetailSpecialService[]
+  newShipments       NewShipment[]
+
+  @@unique([shipmentId])
+}
+
+model Sender {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customerGroupId String   @db.Uuid
+  name            String   @default("")
+  createdAt       DateTime @default(now()) @db.Timestamptz()
+  tenantId        String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  isResidential   Boolean  @default(false)
+  code            String?  @default("")
+  isRecipient     Boolean? @default(false)
+
+  locationId  String        @db.Uuid
+  location    Location      @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  shipment    Shipment[]
+  newShipment NewShipment[]
+
+  @@unique([locationId])
+}
+
+model Receiver {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String   @default("")
+  locationId          String   @db.Uuid
+  specialInstructions String?
+  createdAt           DateTime @default(now()) @db.Timestamptz()
+  tenantId            String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  code                String?  @default("")
+  isResidential       Boolean  @default(false)
+  isRecipient         Boolean? @default(false)
+
+  location    Location      @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  shipment    Shipment[]
+  newShipment NewShipment[]
+
+  @@unique([locationId])
+}
+
+model Location {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String?
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  tenantId  String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  addressId String        @db.Uuid
+  address   Address       @relation(fields: [addressId], references: [id])
+  contact   Contact?
+  sender    Sender?
+  receiver  Receiver?
+  legsFrom  ShipmentLeg[] @relation("LegFromLocation")
+  legsTo    ShipmentLeg[] @relation("LegToLocation")
+
+  @@unique([addressId])
+}
+
+model Address {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  addressLine1 String
+  addressLine2 String?
+  suburb       String
+  state        String
+  postcode     String
+  country      String
+  countryCode  String?  @default("")
+  createdAt    DateTime @default(now()) @db.Timestamptz()
+  tenantId     String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  location Location?
+
+  zoneCardZoneId    String?            @db.Uuid // Links to zone for rate calculation
+  locationType      LocationType?      @default(BUSINESS)
+  addressValidation AddressValidation?
+
+  @@index([postcode, suburb])
+  @@index([zoneCardZoneId])
+}
+
+model Contact {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name             String
+  email            String
+  additionalEmails String[]
+  phoneNumber      String?
+  createdAt        DateTime @default(now()) @db.Timestamptz()
+  tenantId         String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  locationId String   @db.Uuid
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([locationId])
+}
+
+model ShipmentReference {
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  referenceId String
+  shipmentId  String? @db.Uuid
+  tenantId    String  @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  @@unique([referenceId])
+}
+
+model Identifier {
+  id       String @id
+  tenantId String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  @@unique([tenantId, id])
+}
+
+model ShipmentDetailSpecialService {
+  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  shipmentId        String           @db.Uuid
+  specialServiceId  String           @db.Uuid
+  createdAt         DateTime         @default(now()) @db.Timestamptz()
+  updatedAt         DateTime         @updatedAt
+  shipmentDetailsId String?          @db.Uuid
+  shipmentDetails   ShipmentDetails? @relation(fields: [shipmentDetailsId], references: [id])
+
+  @@unique([shipmentId, specialServiceId])
+}
+
+model ShipmentImportHistory {
+  id           String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fileName     String
+  successCount Int
+  errorCount   Int
+  total        Int
+  reference    String?
+
+  createdAt DateTime  @default(now()) @db.Timestamptz()
+  updatedAt DateTime  @default(now()) @updatedAt
+  deletedAt DateTime? @db.Timestamptz(6)
+  tenantId  String    @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  accountId String    @db.Uuid
+
+  shipmentImportData ShipmentImportData[]
+}
+
+model ShipmentImportData {
+  id                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  data                 Json?
+  createdAt            DateTime  @default(now()) @db.Timestamptz()
+  updatedAt            DateTime  @default(now()) @updatedAt
+  deletedAt            DateTime? @db.Timestamptz(6)
+  tenantId             String    @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  shipmentCreateResult Json?
+  errorMessage         String?
+
+  importId String                @db.Uuid
+  import   ShipmentImportHistory @relation(fields: [importId], references: [id], onDelete: Cascade)
+
+  quotes QuoteImportData?
+}
+
+model QuoteImportData {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  data      Json
+  createdAt DateTime  @default(now()) @db.Timestamptz()
+  updatedAt DateTime  @default(now()) @updatedAt
+  deletedAt DateTime? @db.Timestamptz(6)
+  tenantId  String    @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  shipmentImportDataId String             @db.Uuid
+  shipmentImportData   ShipmentImportData @relation(fields: [shipmentImportDataId], references: [id], onDelete: Cascade)
+
+  @@unique([shipmentImportDataId])
+}
+
+model ShipmentImportConfig {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  description String?
+  data        Json
+  createdAt   DateTime  @default(now()) @db.Timestamptz()
+  updatedAt   DateTime  @default(now()) @updatedAt
+  deletedAt   DateTime? @db.Timestamptz(6)
+  tenantId    String    @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+}
+
+enum ImportMappingTemplateType {
+  BULK_IMPORT
+  RECONCILIATION
+}
+
+model ImportMappingTemplate {
+  id        String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  data      Json
+  type      ImportMappingTemplateType @default(BULK_IMPORT)
+  createdAt DateTime                  @default(now()) @db.Timestamptz()
+  updatedAt DateTime                  @default(now()) @updatedAt
+  deletedAt DateTime?                 @db.Timestamptz(6)
+  tenantId  String                    @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  accountId String                    @db.Uuid
+}

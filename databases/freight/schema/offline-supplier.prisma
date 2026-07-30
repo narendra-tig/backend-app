@@ -1,0 +1,239 @@
+model SupplierOffline {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  address   String?
+  notes     String?
+  sections  Json?
+  isStarred Boolean   @default(false)
+  createdAt DateTime  @default(now()) @db.Timestamptz()
+  updatedAt DateTime? @updatedAt
+  tenantId  String    @db.Uuid
+
+  serviceDetails      ServiceDetails?
+  contacts            SupplierContact[]
+  tracking            SupplierTracking?
+  depots              SupplierOfflineDepotLink[]
+  supplierAttachments SupplierAttachment[]
+
+  @@index([tenantId]) // RLS + tenant filtering
+  @@index([tenantId, isStarred]) // starred filter
+  @@index([tenantId, name]) // name search/filter
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, name: "supplier_offline_name_trgm_index")
+}
+
+model ServiceDetails {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  area         String?
+  cutOff       DateTime? @db.Time()
+  cutOffAt     DateTime? @db.Timestamptz()
+  houseAccount String?
+  phoneNumber  String?
+  createdAt    DateTime? @default(now()) @db.Timestamptz()
+  updatedAt    DateTime? @updatedAt
+  tenantId     String    @db.Uuid
+
+  supplierServices SupplierService[]
+  packageTypes     PackageType[]
+  supplierId       String            @db.Uuid
+  supplier         SupplierOffline   @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@unique([supplierId])
+  @@index([supplierId])
+  @@index([area(ops: raw("gin_trgm_ops"))], type: Gin, name: "service_details_area_trgm_index")
+  @@index([phoneNumber(ops: raw("gin_trgm_ops"))], type: Gin, name: "service_details_phone_number_trgm_index")
+}
+
+model SupplierService {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  createdAt DateTime  @default(now()) @db.Timestamptz()
+  updatedAt DateTime? @updatedAt
+  tenantId  String    @db.Uuid
+
+  serviceDetailsId String         @db.Uuid
+  serviceDetails   ServiceDetails @relation(fields: [serviceDetailsId], references: [id], onDelete: Cascade)
+
+  @@index([serviceDetailsId]) // join from ServiceDetails
+  @@index([serviceDetailsId, name]) // name filter + join
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, name: "supplier_service_name_trgm_index")
+}
+
+model PackageType {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  createdAt DateTime  @default(now()) @db.Timestamptz()
+  updatedAt DateTime? @updatedAt
+  tenantId  String    @db.Uuid
+
+  serviceDetailsId String         @db.Uuid
+  serviceDetails   ServiceDetails @relation(fields: [serviceDetailsId], references: [id], onDelete: Cascade)
+
+  @@index([serviceDetailsId]) // join from ServiceDetails
+  @@index([serviceDetailsId, name]) // name filter + join
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, name: "package_type_name_trgm_index")
+}
+
+model SupplierContact {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String?
+  description String?
+  phoneNumber String?
+  email       String?
+  createdAt   DateTime? @default(now()) @db.Timestamptz()
+  updatedAt   DateTime? @updatedAt
+  tenantId    String    @db.Uuid
+
+  supplierId String          @db.Uuid
+  supplier   SupplierOffline @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@index([supplierId]) // join from SupplierOffline
+  @@index([supplierId, name]) // name filter + join
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, name: "supplier_contact_name_trgm_index")
+}
+
+model SupplierTracking {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userName  String?
+  site      String?
+  password  String?
+  createdAt DateTime  @default(now()) @db.Timestamptz()
+  updatedAt DateTime? @updatedAt
+  tenantId  String    @db.Uuid
+
+  supplierId String          @db.Uuid
+  supplier   SupplierOffline @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@unique([supplierId])
+  @@index([supplierId]) // join from SupplierOffline
+}
+
+model Depot {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  address   String?
+  notes     String?
+  sections  Json?
+  isStarred Boolean   @default(false)
+  createdAt DateTime  @default(now()) @db.Timestamptz()
+  updatedAt DateTime? @updatedAt
+  tenantId  String    @db.Uuid
+
+  depotAttachments DepotAttachment[]
+  depotDetails     DepotDetails?
+  depotContacts    DepotContact[]
+  suppliers        SupplierOfflineDepotLink[]
+
+  @@index([tenantId]) // RLS + tenant filtering
+  @@index([tenantId, isStarred]) // starred filter
+  @@index([tenantId, name]) // name search/filter
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, name: "depot_name_trgm_index")
+}
+
+model DepotDetails {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  area         String?
+  cutOff       DateTime? @db.Time()
+  cutOffAt     DateTime? @db.Timestamptz()
+  houseAccount String?
+  phoneNumber  String?
+  createdAt    DateTime? @default(now()) @db.Timestamptz()
+  updatedAt    DateTime? @updatedAt
+  tenantId     String    @db.Uuid
+
+  depotId           String             @db.Uuid
+  depot             Depot              @relation(fields: [depotId], references: [id], onDelete: Cascade)
+  depotServices     DepotService[]
+  depotPackageTypes DepotPackageType[]
+
+  @@unique([depotId])
+  @@index([depotId])
+  @@index([area(ops: raw("gin_trgm_ops"))], type: Gin, name: "depot_details_area_trgm_index")
+  @@index([phoneNumber(ops: raw("gin_trgm_ops"))], type: Gin, name: "depot_details_phone_number_trgm_index")
+}
+
+model DepotService {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  createdAt DateTime  @default(now()) @db.Timestamptz()
+  updatedAt DateTime? @updatedAt
+  tenantId  String    @db.Uuid
+
+  depotDetailsId String       @db.Uuid
+  depotDetails   DepotDetails @relation(fields: [depotDetailsId], references: [id], onDelete: Cascade)
+
+  @@index([depotDetailsId, name]) // name filter + join
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, name: "depot_service_name_trgm_index")
+}
+
+model DepotPackageType {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  createdAt DateTime  @default(now()) @db.Timestamptz()
+  updatedAt DateTime? @updatedAt
+  tenantId  String    @db.Uuid
+
+  depotDetailsId String       @db.Uuid
+  depotDetails   DepotDetails @relation(fields: [depotDetailsId], references: [id], onDelete: Cascade)
+
+  @@index([depotDetailsId]) // join from DepotDetails
+  @@index([depotDetailsId, name]) // name filter + join
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, name: "depot_package_type_name_trgm_index")
+}
+
+model DepotContact {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String?
+  description String?
+  phoneNumber String?
+  email       String?
+  createdAt   DateTime  @default(now()) @db.Timestamptz()
+  updatedAt   DateTime? @updatedAt
+  tenantId    String    @db.Uuid
+
+  depotId String @db.Uuid
+  depot   Depot  @relation(fields: [depotId], references: [id], onDelete: Cascade)
+
+  @@index([depotId]) // join from Depot
+  @@index([depotId, name]) // name filter + join
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, name: "depot_contact_name_trgm_index")
+}
+
+model DepotAttachment {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fileName  String?
+  reference String?
+  size      Int?
+  createdAt DateTime  @default(now()) @db.Timestamptz()
+  updatedAt DateTime? @updatedAt
+  tenantId  String    @db.Uuid
+
+  depotId String @db.Uuid
+  depot   Depot  @relation(fields: [depotId], references: [id], onDelete: Cascade)
+
+  @@index([depotId]) // join from Depot
+}
+
+model SupplierOfflineDepotLink {
+  supplier   SupplierOffline @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  supplierId String          @db.Uuid
+  depot      Depot           @relation(fields: [depotId], references: [id], onDelete: Cascade)
+  depotId    String          @db.Uuid
+  createdAt  DateTime        @default(now())
+
+  @@id([supplierId, depotId])
+}
+
+model SupplierAttachment {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fileName  String?
+  reference String?
+  size      Int?
+  createdAt DateTime  @default(now()) @db.Timestamptz()
+  updatedAt DateTime? @updatedAt
+  tenantId  String    @db.Uuid
+
+  supplierId String          @db.Uuid
+  supplier   SupplierOffline @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@index([supplierId]) // join from SupplierOffline
+}

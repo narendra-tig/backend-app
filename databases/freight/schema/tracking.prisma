@@ -1,0 +1,64 @@
+model ShipmentTracking {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  shipmentId String @unique @db.Uuid
+  tenantId   String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  status String?
+
+  minEta DateTime? @db.Timestamptz()
+  minEtt Int?
+  maxEta DateTime? @db.Timestamptz()
+  maxEtt Int?
+  avgEta DateTime? @db.Timestamptz()
+  avgEtt Int?
+
+  timeEstimates Json?
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+
+  shipment     Shipment           @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  timeslots    TrackingTimeslot[]
+  events       TrackingEvent[]
+  newShipments NewShipment[]
+}
+
+model TrackingTimeslot {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  trackingId String @db.Uuid
+  tenantId   String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  startTime DateTime @db.Timestamptz()
+  endTime   DateTime @db.Timestamptz()
+  type      String
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+
+  tracking ShipmentTracking @relation(fields: [trackingId], references: [id], onDelete: Cascade)
+}
+
+model TrackingEvent {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  trackingId String @db.Uuid
+  tenantId   String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  trackingNumber String
+  carrierCode    String?
+
+  locationSuburb   String?
+  locationState    String?
+  locationPostcode String?
+  locationCountry  String?
+
+  eventCode        String
+  eventDescription String
+  signedBy         String?
+  fileId           String? @db.Uuid
+
+  eventTime DateTime @db.Timestamptz()
+  createdAt DateTime @default(now()) @db.Timestamptz()
+
+  tracking ShipmentTracking @relation(fields: [trackingId], references: [id], onDelete: Cascade)
+
+  @@index([trackingNumber, eventTime])
+}

@@ -1,0 +1,62 @@
+enum ReconciliationStatus {
+  UNRECONCILED
+  RECONCILED
+}
+
+model ReconciliationHistory {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  carrier             String
+  invoiceId           String
+  fileName            String
+  fileReference       String
+  numberOfShipments   Int       @default(0)
+  unreconciled        Int       @default(0)
+  reconciled          Int       @default(0)
+  dispute             Int       @default(0)
+  totalDiscrepancy    Float     @default(0)
+  adjustedDiscrepancy Float     @default(0)
+  quotedTotal         Float     @default(0)
+  billTotal           Float     @default(0)
+  reratedTotal        Float     @default(0)
+  shipmentReferenceId String?
+  createdAt           DateTime  @default(now()) @db.Timestamptz()
+  updatedAt           DateTime  @default(now()) @updatedAt
+  deletedAt           DateTime? @db.Timestamptz(6)
+  tenantId            String    @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  accountId           String    @default(dbgenerated("'00000000-0000-0000-0000-000000000000'::uuid")) @db.Uuid
+
+  reconciliationData ReconciliationData[]
+
+  @@index([invoiceId], name: "reconciliation_history_invoice_id_index")
+}
+
+model ReconciliationData {
+  id                  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  invoiceId           String
+  fromZone            String
+  toZone              String
+  weight              Float
+  quantity            Int
+  adjustedDiscrepancy Float?
+  shipmentReferenceId String?
+  quotedShipment      Json?
+  supplierBill        Json?
+  rerating            Json?
+  sender              Json?
+  receiver            Json?
+  notes               String?
+  isDisputed          Boolean              @default(false)
+  status              ReconciliationStatus @default(UNRECONCILED)
+  errorMessage        String?
+  discrepancy         Float?
+  createdAt           DateTime             @default(now()) @db.Timestamptz()
+  updatedAt           DateTime             @default(now()) @updatedAt
+  deletedAt           DateTime?            @db.Timestamptz(6)
+  tenantId            String               @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  reconciliationId String                @db.Uuid
+  reconciliation   ReconciliationHistory @relation(fields: [reconciliationId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId], name: "reconciliation_data_invoice_id_index")
+  @@index([shipmentReferenceId], name: "reconciliation_data_shipment_reference_id_index")
+}

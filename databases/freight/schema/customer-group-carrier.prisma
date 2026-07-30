@@ -1,0 +1,85 @@
+enum CustomerGroupCarrierVisibilityStatus {
+  CGC_PUBLIC
+  CGC_PRIVATE
+}
+
+enum CustomerGroupCarrierStatus {
+  CGC_PENDING
+  CGC_ACTIVE
+  CGC_INACTIVE
+}
+
+enum CustomerGroupCarrierChargeAccountType {
+  CGC_TENANT_ACCOUNT
+  CGC_CUSTOMER_ACCOUNT
+  CGC_SHARED_ACCOUNT
+}
+
+model CustomerGroupCarrier {
+  id                  String                                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  accountCarrierId    String                                 @db.Uuid
+  customerGroupId     String                                 @db.Uuid
+  chargeAccountNumber String?
+  nameTag             String?
+  accountOwner        String?
+  visibilityStatus    CustomerGroupCarrierVisibilityStatus?
+  quoteExternally     Boolean                                @default(false)
+  status              CustomerGroupCarrierStatus             @default(CGC_PENDING)
+  chargeAccountType   CustomerGroupCarrierChargeAccountType?
+  tenantId            String                                 @db.Uuid
+  createdAt           DateTime                               @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime                               @updatedAt
+  carrierConnection   CarrierConnection?
+  accountCarrier      AccountCarrier                         @relation(fields: [accountCarrierId], references: [id], onDelete: Cascade)
+  services            CustomerGroupCarrierService[]
+  deleted             Boolean                                @default(false)
+  config              CustomerGroupCarrierConfig?
+  isSharedConfig      Boolean                                @default(false)
+}
+
+enum CustomerGroupCarrierServiceStatus {
+  CGCS_PENDING
+  CGCS_ACTIVE
+  CGCS_INACTIVE
+}
+
+model CustomerGroupCarrierService {
+  id                      String                            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customerGroupCarrierId  String                            @db.Uuid
+  accountCarrierServiceId String                            @db.Uuid
+  tenantId                String                            @db.Uuid
+  status                  CustomerGroupCarrierServiceStatus @default(CGCS_PENDING)
+  instructions            String?
+  prefix                  String?
+  rangeMin                Float?
+  rangeMax                Float?
+  internalServiceCode     String?                           @unique
+  shareService            Boolean                           @default(false)
+  createdAt               DateTime                          @default(now()) @db.Timestamptz(6)
+  updatedAt               DateTime                          @updatedAt
+  accountCarrierService   AccountCarrierService             @relation(fields: [accountCarrierServiceId], references: [id], onDelete: Cascade)
+  customerGroupCarrier    CustomerGroupCarrier              @relation(fields: [customerGroupCarrierId], references: [id], onDelete: Cascade)
+  deleted                 Boolean                           @default(false)
+  isSharedConfig          Boolean                           @default(false)
+
+  @@unique([customerGroupCarrierId, accountCarrierServiceId])
+}
+
+model CustomerGroupCarrierConfig {
+  id                     String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customerGroupCarrierId String               @db.Uuid
+  tenantId               String               @db.Uuid
+  consignmentPrefix      String?
+  consignmentMax         Int?
+  consignmentMin         Int?
+  consignmentNextId      Int?
+  manifestPrefix         String?
+  manifestMax            Int?
+  manifestMin            Int?
+  manifestNextId         Int?
+  createdAt              DateTime             @default(now()) @db.Timestamptz()
+  updatedAt              DateTime             @updatedAt
+  customerGroupCarrier   CustomerGroupCarrier @relation(fields: [customerGroupCarrierId], references: [id], onDelete: Cascade)
+
+  @@unique([customerGroupCarrierId])
+}

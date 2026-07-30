@@ -1,0 +1,74 @@
+model TenancyCarrier {
+  id                String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  masterCarrierId   String                  @db.Uuid
+  tenantId          String                  @db.Uuid
+  createdAt         DateTime                @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime                @updatedAt
+  accounts          AccountCarrier[]
+  carrierConnection CarrierConnection?
+  rateCards         RateCard[]
+  masterCarrier     MasterCarrier           @relation(fields: [masterCarrierId], references: [id], onDelete: Cascade)
+  services          TenancyCarrierService[]
+  tenancyProfiles   TenancyCarrierProfile[]
+  config            TenancyCarrierConfig?
+  deleted           Boolean                 @default(false)
+  isEnabled         Boolean                 @default(false)
+
+  @@unique([masterCarrierId, tenantId])
+}
+
+model TenancyCarrierService {
+  id                     String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenancyCarrierId       String                  @db.Uuid
+  masterCarrierServiceId String                  @db.Uuid
+  tenantId               String                  @db.Uuid
+  prefix                 String?
+  rangeMin               Float?
+  rangeMax               Float?
+  createdAt              DateTime                @default(now()) @db.Timestamptz(6)
+  updatedAt              DateTime                @updatedAt
+  accountServices        AccountCarrierService[]
+  masterCarrierService   MasterCarrierService    @relation(fields: [masterCarrierServiceId], references: [id], onDelete: Cascade)
+  tenancyCarrier         TenancyCarrier          @relation(fields: [tenancyCarrierId], references: [id], onDelete: Cascade)
+  deleted                Boolean                 @default(false)
+  isEnabled              Boolean                 @default(false)
+
+  surcharges Surcharge[]
+  fuelLevies FuelLevy[]
+
+  @@unique([tenancyCarrierId, masterCarrierServiceId])
+}
+
+model TenancyCarrierProfile {
+  id               String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenancyCarrierId String         @db.Uuid
+  tenantId         String         @db.Uuid
+  about            String?
+  notes            String?
+  phone            String?
+  address          String?
+  suburb           String?
+  state            String?
+  postCode         String?
+  createdAt        DateTime       @default(now()) @db.Timestamptz()
+  updatedAt        DateTime       @updatedAt
+  tenancyCarrier   TenancyCarrier @relation(fields: [tenancyCarrierId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, tenancyCarrierId])
+}
+
+model TenancyCarrierConfig {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenancyCarrierId String   @db.Uuid
+  tenantId         String   @db.Uuid
+  consignmentMax   Int?
+  manifestMax      Int?
+  consignmentMin   Int?
+  manifestMin      Int?
+  createdAt        DateTime @default(now()) @db.Timestamptz()
+  updatedAt        DateTime @default(now()) @updatedAt
+
+  tenancyCarrier TenancyCarrier @relation(fields: [tenancyCarrierId], references: [id], onDelete: Cascade)
+
+  @@unique([tenancyCarrierId])
+}

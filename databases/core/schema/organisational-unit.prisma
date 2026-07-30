@@ -1,0 +1,43 @@
+enum OrganisationalUnitType {
+  TENANCY        @map("tenancy")
+  ACCOUNT        @map("account")
+  HUB            @map("hub")
+  CUSTOMER_GROUP @map("customer_group")
+}
+
+model OrganisationalUnit {
+  id                String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  namespace         String
+  name              String
+  displayName       String
+  type              OrganisationalUnitType?
+  displayNamespace  String                  @default("")
+  tenantId          String                  @db.Uuid
+  createdAt         DateTime                @default(now()) @db.Timestamptz()
+  updatedAt         DateTime                @updatedAt
+  ofAccountId       String?                 @db.Uuid
+  ofCustomerGroupId String?                 @db.Uuid
+
+  tenant      Tenant                   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  from        OrganisationalUnitEdge[] @relation("from")
+  to          OrganisationalUnitEdge[] @relation("to")
+  users       User[]
+  permissions Permission[]
+
+  @@unique(fields: [name, namespace, tenantId], name: "namespaceAndNameInTenant")
+}
+
+model OrganisationalUnitEdge {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fromId    String   @db.Uuid
+  toId      String   @db.Uuid
+  tenantId  String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+
+  from   OrganisationalUnit @relation(fields: [fromId], references: [id], name: "from", onDelete: Cascade)
+  to     OrganisationalUnit @relation(fields: [toId], references: [id], name: "to", onDelete: Cascade)
+  tenant Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique(fields: [fromId, toId], name: "fromIdToIdInOrganisationalUnitEdge")
+}

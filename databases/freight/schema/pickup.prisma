@@ -1,0 +1,78 @@
+enum PickupStatus {
+  CONFIRMED
+  PENDING
+  COMPLETED
+  CANCELLED
+  ERROR
+  SHIPPER
+  HELD
+  PROCESSING
+  REBOOKED
+  HIDDEN
+  PROCESSED
+}
+
+enum NewPickupStatus {
+  PICKUP_CONFIRMED
+  PICKUP_PENDING
+  PICKUP_COMPLETED
+  PICKUP_CANCELLED
+  PICKUP_ERROR
+  PICKUP_SHIPPER
+  PICKUP_HELD
+  PICKUP_PROCESSING
+  PICKUP_REBOOKED
+  PICKUP_HIDDEN
+  PICKUP_PROCESSED
+}
+
+model Pickup {
+  id                  String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pickupReference     String           @unique
+  pickupDate          DateTime
+  readyTime           DateTime
+  closingTime         DateTime?
+  timezone            String
+  internalReference   String?
+  pickupArea          String?
+  specialInstructions String?
+  createdAt           DateTime         @default(now()) @db.Timestamptz()
+  tenantId            String           @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  pickupStatus        PickupStatus     @default(CONFIRMED)
+  receiverName        String?
+  senderName          String?
+  status              NewPickupStatus? @default(PICKUP_CONFIRMED)
+
+  shipmentId  String?       @db.Uuid
+  shipment    Shipment?     @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  newShipment NewShipment[]
+  PickupTask  PickupTask[]
+
+  @@unique([shipmentId])
+  @@index([senderName])
+  @@index([receiverName])
+}
+
+enum PickupType {
+  PT_AUTOBOOK
+  PT_PERMANENT
+}
+
+model PickupConfig {
+  id                          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  accountName                 String
+  customerGroupId             String     @db.Uuid
+  supplierName                String
+  serviceName                 String
+  serviceId                   String     @db.Uuid
+  pickupType                  PickupType @default(PT_PERMANENT)
+  specialInstructionsAndNotes String
+  tenantId                    String     @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  accountId                   String     @default(dbgenerated("(current_setting('app.account_id'::text))::uuid")) @db.Uuid
+  closeTime                   String?
+  pickupTimeZone              String?
+  pickupArea                  String?
+  cutOffTime                  String?
+  createdAt                   DateTime   @default(now()) @db.Timestamptz()
+  updatedAt                   DateTime   @updatedAt
+}

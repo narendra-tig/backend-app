@@ -1,0 +1,34 @@
+enum WatchUntil {
+  IS_DELIVERED
+  IS_DELIVERED_PLUS_7
+  IS_DELIVERED_PLUS_14
+  IS_CANCELLED
+  DAYS_7
+  DAYS_14
+  DAYS_30
+  DAYS_60
+  DAYS_90
+  INDEFINITELY
+}
+
+model Watchlist {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String    @db.Uuid
+  shipmentId        String?   @db.Uuid
+  newShipmentId     String?   @db.Uuid
+  notes             String?
+  watchUntil        String
+  sendNotifications Boolean   @default(false)
+  hasUpdates        Boolean?  @default(false)
+  tenantId          String    @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  createdAt         DateTime  @default(now()) @db.Timestamptz()
+  updatedAt         DateTime  @default(now()) @updatedAt
+  deleted           Boolean?  @default(false)
+  deletedDate       DateTime? @db.Timestamptz()
+
+  shipment    Shipment?    @relation(fields: [shipmentId], references: [id])
+  newShipment NewShipment? @relation(fields: [newShipmentId], references: [id])
+
+  @@index([userId, shipmentId])
+  @@index([userId, newShipmentId])
+}

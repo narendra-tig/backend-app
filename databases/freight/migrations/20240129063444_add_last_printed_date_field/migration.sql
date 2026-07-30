@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Paperwork" ADD COLUMN     "lastPrintedDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

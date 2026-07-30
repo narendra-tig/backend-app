@@ -1,0 +1,151 @@
+enum MasterCarrierStatus {
+  PENDING
+  ACTIVE
+  INACTIVE
+}
+
+enum MasterCarrierServiceStatus {
+  SERVICE_PENDING
+  SERVICE_ACTIVE
+  SERVICE_INACTIVE
+}
+
+//  Notes is a field provided to add information if any supplier or master carrier status is changed to INACTIVE
+model MasterCarrier {
+  id               String                       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name             String                       @unique
+  displayName      String
+  createdAt        DateTime                     @default(now()) @db.Timestamptz()
+  updatedAt        DateTime                     @updatedAt
+  status           MasterCarrierStatus          @default(PENDING)
+  previousStatus   MasterCarrierStatus          @default(PENDING)
+  notes            String?
+  refShortHand     String?
+  isActivated      Boolean                      @default(true)
+  tenancies        TenancyCarrier[]
+  services         MasterCarrierService[]
+  packageTypes     MasterCarrierPackageType[]
+  contacts         MasterCarrierContactDetails?
+  userContacts     MasterCarrierContact[]
+  connectionSchema CarrierConnectionSchema?
+  zoneCards        ZoneCard[]
+  zoneETACards     ZoneETACard[]
+  config           MasterCarrierConfig?
+  pickupConfig     CarrierPickupConfig?
+}
+
+model MasterCarrierContactDetails {
+  id              String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  masterCarrierId String  @unique @db.Uuid
+  phone           String?
+  address         String?
+  suburb          String?
+  state           String?
+  postCode        String?
+
+  masterCarrier MasterCarrier @relation(fields: [masterCarrierId], references: [id])
+}
+
+// Each service will have a status of PENDING, ACTIVE, INACTIVE and will be associated with a master carrier
+// Master carrier will have a status of PENDING, ACTIVE, INACTIVE and will have a list of services
+// Hub User or Carrier Admin can change status ofF a service of a master carrier
+model MasterCarrierService {
+  id                                 String                               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  masterCarrierId                    String                               @db.Uuid
+  service                            String
+  displayName                        String
+  internalServiceCode                String                               @unique
+  supplierServiceCode                String
+  printedConsignmentServiceCode      String
+  labelServiceCode                   String
+  weightMin                          Float?
+  weightMax                          Float?
+  volumeMin                          Float?
+  volumeMax                          Float?
+  defaultCubic                       String?
+  dangerousGoodsAccepted             Boolean?                             @default(false)
+  prefixRequired                     Boolean?                             @default(false)
+  isActivated                        Boolean                              @default(true)
+  createdAt                          DateTime                             @default(now()) @db.Timestamptz()
+  updatedAt                          DateTime                             @updatedAt
+  status                             MasterCarrierServiceStatus           @default(SERVICE_PENDING)
+  masterCarrier                      MasterCarrier                        @relation(fields: [masterCarrierId], references: [id], onDelete: Cascade)
+  tenancyServices                    TenancyCarrierService[]
+  servicePackageTypes                MasterCarrierServicePackageType[]
+  masterCarrierServiceSpecialService MasterCarrierServiceSpecialService[]
+
+  @@unique([masterCarrierId, service])
+  @@index([masterCarrierId], name: "master_carrier_service_carrier_id_index")
+}
+
+model MasterCarrierContact {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  masterCarrierId String        @db.Uuid
+  firstName       String
+  lastName        String
+  jobTitle        String?
+  phoneNumber     String?
+  email           String?
+  notes           String?
+  createdAt       DateTime      @default(now()) @db.Timestamptz()
+  updatedAt       DateTime      @updatedAt
+  masterCarrier   MasterCarrier @relation(fields: [masterCarrierId], references: [id], onDelete: Cascade)
+}
+
+model MasterCarrierConfig {
+  id                        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  masterCarrierId           String   @db.Uuid
+  consignmentPrefix         String?
+  consignmentLength         Int?
+  consignmentPrefixRequired Boolean?
+  manifestPrefix            String?
+  manifestLength            Int?
+  manifestPrefixRequired    Boolean?
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @default(now()) @updatedAt
+
+  masterCarrier MasterCarrier @relation(fields: [masterCarrierId], references: [id], onDelete: Cascade)
+
+  @@unique([masterCarrierId])
+}
+
+model SpecialService {
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId    String? @db.Uuid
+  name        String
+  displayName String
+  serviceType String?
+  details     String?
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+
+  masterCarrierServiceSpecialService MasterCarrierServiceSpecialService[]
+}
+
+model MasterCarrierServiceSpecialService {
+  id                     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  masterCarrierServiceId String @db.Uuid
+  specialServiceId       String @db.Uuid
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+
+  masterCarrierService MasterCarrierService @relation(fields: [masterCarrierServiceId], references: [id], onDelete: Cascade)
+  specialService       SpecialService       @relation(fields: [specialServiceId], references: [id], onDelete: Cascade)
+
+  @@unique([masterCarrierServiceId, specialServiceId])
+}
+
+model CarrierPickupConfig {
+  id              String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  masterCarrierId String  @unique @db.Uuid
+  cutOffTime      String?
+  timezone        String?
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+
+  masterCarrier MasterCarrier @relation(fields: [masterCarrierId], references: [id], onDelete: Cascade)
+}

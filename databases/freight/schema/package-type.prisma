@@ -1,0 +1,43 @@
+model MasterCarrierPackageType {
+  id                  String                            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String // name is like the value, displayName is like the label
+  displayName         String
+  platformType        String
+  lengthMin           Float?
+  lengthMax           Float?
+  widthMin            Float?
+  widthMax            Float?
+  heightMin           Float?
+  heightMax           Float?
+  weightMin           Float?
+  weightMax           Float?
+  volumeMin           Float?
+  volumeMax           Float?
+  cubicMin            Float?
+  cubicMax            Float?
+  masterCarrierId     String                            @db.Uuid
+  createdAt           DateTime                          @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime                          @updatedAt
+  masterCarrier       MasterCarrier                     @relation(fields: [masterCarrierId], references: [id], onDelete: Cascade)
+  servicePackageTypes MasterCarrierServicePackageType[]
+}
+
+model MasterCarrierPlatformPackageType {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  displayName String
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt
+}
+
+model MasterCarrierServicePackageType {
+  id                         String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  masterCarrierServiceId     String                   @db.Uuid
+  masterCarrierPackageTypeId String                   @db.Uuid
+  createdAt                  DateTime                 @default(now()) @db.Timestamptz(6)
+  updatedAt                  DateTime                 @updatedAt
+  masterCarrierService       MasterCarrierService     @relation(fields: [masterCarrierServiceId], references: [id], onDelete: Cascade)
+  masterCarrierPackageType   MasterCarrierPackageType @relation(fields: [masterCarrierPackageTypeId], references: [id], onDelete: Cascade)
+
+  @@unique([masterCarrierServiceId, masterCarrierPackageTypeId], name: "masterCarrierServicePackageTypeId")
+}

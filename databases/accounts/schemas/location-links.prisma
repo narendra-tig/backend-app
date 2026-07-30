@@ -1,0 +1,47 @@
+enum ResourceType {
+  ACCOUNT        @map("account")
+  CUSTOMER_GROUP @map("customer_group")
+  DEPOT          @map("depot")
+}
+
+model DispatchLocation {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  resource   String
+  resourceId String   @db.Uuid
+  locationId String   @db.Uuid
+
+  location Location @relation(fields: [locationId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  tenantId   String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  @@unique([locationId], map: "uq_dispatch_locations_location_id")
+  @@index([tenantId, resourceId], map: "idx_dispatch_locations_tenant_resource_id")
+}
+
+model ReceiverLocationV2 {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  resource   String
+  resourceId String   @db.Uuid
+  locationId String   @db.Uuid
+
+  location Location @relation(fields: [locationId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  tenantId   String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  @@unique([locationId], map: "uq_receiver_locations_location_id")
+  @@index([tenantId, resourceId], map: "idx_receiver_locations_tenant_resource_id")
+}
+
+model DepotLocation {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  resource   String
+  resourceId String   @db.Uuid
+  locationId String   @db.Uuid
+
+  location Location @relation(fields: [locationId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  tenantId   String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  @@unique([locationId], map: "uq_depot_locations_location_id")
+  @@index([tenantId, resourceId], map: "idx_depot_locations_tenant_resource_id")
+}

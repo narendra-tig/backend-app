@@ -1,0 +1,41 @@
+model DangerousGoods {
+  id                    String                  @id @default(dbgenerated("gen_random_uuid()"))
+  name                  String
+  shippingName          String
+  unNumber              String
+  hazardClass           String
+  packagingGroup        String?
+  subsidiaryRisk        String?
+  hazchemCode           String?
+  flashPoint            Float?
+  shortCode             String?
+  weight                Float?
+  isMarinePollutant     Boolean
+  packagingInstructions String?
+  additionalInformation String?
+  tenantId              String                  @db.Uuid
+  accountId             String                  @db.Uuid
+  organisationalUnitId  String?                 @db.Uuid
+  ofAccountId           String?                 @db.Uuid
+  ofDangerousGoodId     String?                 @db.Uuid
+  ofCustomerGroupId     String?                 @db.Uuid
+  createdAt             DateTime                @default(now()) @db.Timestamptz()
+  updatedAt             DateTime                @updatedAt
+  Account               Account                 @relation(fields: [accountId], references: [id])
+  packageContents       CustomPackageContents[]
+
+  @@index([tenantId, accountId])
+}
+
+model DangerousGoodsContact {
+  id                String   @id @default(dbgenerated("gen_random_uuid()"))
+  contactName       String
+  contactNumber     String
+  accountId         String   @db.Uuid
+  tenantId          String   @db.Uuid
+  ofAccountId       String?  @db.Uuid
+  ofCustomerGroupId String?  @db.Uuid
+  createdAt         DateTime @default(now()) @db.Timestamptz()
+  updatedAt         DateTime @updatedAt
+  Account           Account  @relation(fields: [accountId], references: [id])
+}

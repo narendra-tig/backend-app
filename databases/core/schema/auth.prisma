@@ -1,0 +1,150 @@
+enum AuthenticationType {
+  INTERNAL
+  MICROSOFT
+  GOOGLE
+}
+
+enum SsoConfigurationStatus {
+  ACTIVE
+  PENDING
+  INACTIVE
+}
+
+enum ConnectionModuleType {
+  HUB
+  TENANT
+  ACCOUNT
+  CUSTOMER_GROUP
+  PUBLIC_API
+  WAREHOUSE
+}
+
+enum SessionModule {
+  AUTH_LOGIN
+  TWO_FA_CHALLENGE
+  SSO_INBOUND
+  AUTHENTICATED
+  IMPERSONATION
+  ACCESSING_CUSTOMER_ACCOUNT
+  RESET_PASSWORD
+  ACCOUNT_INVITATION
+  PASSWORD_RESET_INVITATION
+  ACCEPTED_INVITATION
+  ACCEPTED_ONBOARDING
+  PASSWORD_CREATED
+  PASSWORD_UPDATED
+  UPDATE_SESSION
+}
+
+model UserCredentials {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId             String    @unique @db.Uuid
+  tenantId           String    @db.Uuid
+  email              String    @unique
+  password           String?
+  isVerified         Boolean   @default(false)
+  isMfaEnabled       Boolean   @default(false)
+  isSSOEnabled       Boolean   @default(false)
+  totpSecret         String? // Secret for MFA
+  lasttotpVerifiedAt DateTime? // Last time MFA was verified 
+  createdAt          DateTime  @default(now()) @db.Timestamptz()
+  updatedAt          DateTime  @updatedAt
+
+  User User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([email, tenantId, userId], name: "unique_user_email_tenant")
+  @@index([tenantId], name: "idx_user_credentials_tenant")
+}
+
+model ApplicationConfiguration {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  applicationName   String
+  applicationConfig Json // URL, REFERENCE as key value pair
+  applicationKey    String   @unique // Key for the application :: tenancy, account, hub, public-api, warehouse, etc
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now()) @db.Timestamptz()
+  updatedAt         DateTime @updatedAt
+}
+
+// TO BE DELETED 
+model UserAuthenticationProvider {
+  id                      String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId                  String             @db.Uuid
+  tenantId                String             @db.Uuid
+  userCredentialId        String?            @db.Uuid
+  authenticationType      AuthenticationType
+  authenticationReference Json // Account Name, Tenancy Name and other reference as key value pair
+  authenticationId        String             @db.Uuid // Reference to the AuthCredentials
+  createdAt               DateTime           @default(now()) @db.Timestamptz()
+  updatedAt               DateTime           @updatedAt
+
+  AuthenticationProviderCredentials AuthenticationProviderCredentials? @relation(fields: [authenticationId], references: [id])
+
+  @@unique([userId, tenantId, authenticationType, authenticationId], name: "unique_user_authentication_provider")
+  @@index([userCredentialId], name: "idx_user_authentication_provider_credential")
+}
+
+model AuthenticationProviderCredentials {
+  id                   String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  authenticationName   String
+  authenticationKey    String
+  authenticationType   AuthenticationType // Internal, Microsoft, Google, Okta, etc
+  authenticationSecret Json // JSON data for the authentication SECRET 
+  createdAt            DateTime           @default(now()) @db.Timestamptz()
+  updatedAt            DateTime           @updatedAt
+
+  UserAuthenticationProvider UserAuthenticationProvider[]
+
+  @@unique([authenticationName, authenticationKey, authenticationType], name: "unique_authentication_provider")
+}
+
+model SsoConfiguration {
+  id             String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId       String                 @db.Uuid
+  accountCode    String // Account code for which the SSO is configured
+  entryPoint     String? // SSO Entry Point URL
+  callbackUrl    String? // SSO Callback URL
+  cert           String? // SSO Certificate
+  issuer         String? // SSO Issuer
+  status         SsoConfigurationStatus @default(PENDING)
+  hierarchyLevel String
+  accountId      String?                @db.Uuid // Account ID for which the SSO is configured, if applicable
+  createdAt      DateTime               @default(now()) @db.Timestamptz()
+  updatedAt      DateTime               @updatedAt
+
+  @@unique([tenantId, accountCode], name: "unique_sso_configuration")
+  @@index([accountCode], name: "idx_sso_configuration_account_code")
+}
+
+model UserSession {
+  id                               String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId                           String        @db.Uuid
+  tenantId                         String        @db.Uuid
+  applicationId                    String
+  applicationName                  String // Tenancy, Account, Hub, Public API, Warehouse, etc
+  sessionToken                     String        @unique // JWT
+  isActive                         Boolean       @default(true)
+  sessionModule                    SessionModule // AUTH_LOGIN, TWO_FA_CHALLENGE, SSO_INBOUND, IMPERSONATION, RESET_PASSWORD, ACCOUNT_INVITATION
+  expiresAt                        DateTime
+  isImpersonated                   Boolean       @default(false)
+  isAccessingCustomerAccount       Boolean       @default(false) // Indicates if the session is for accessing a customer account
+  impersonatedBy                   String?       @db.Uuid // User ID of impersonator
+  impersonatedConnectionModuleID   String?       @db.Uuid // ID of the Tenant or Customer Group Impersonated
+  impersonatedConnectionModuleType String? // Name of the Tenant or Customer Group Impersonated
+  accessingBy                      String?       @db.Uuid // User ID of the user accessing the customer account
+  accessingAccountId               String?       @db.Uuid // ID of the account being accessed
+  accessingConnectionModuleType    String? // Type of the connection module being accessed
+  refreshToken                     String?       @unique // JWT for refresh
+  refreshTokenExpiresAt            DateTime? // Expiry for the refresh token
+  ipAddress                        String? // IP Address of the user
+  userAgent                        String? // User Agent of the browser or client
+  geo                              Json? // Location of the user
+  isOnboarded                      Boolean       @default(false) // Indicates if the user has completed onboarding
+  isVerified                       Boolean       @default(false) // Indicates if the session is active
+  updatedAt                        DateTime      @updatedAt
+  createdAt                        DateTime      @default(now()) @db.Timestamptz()
+
+  User User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

@@ -1,0 +1,14 @@
+model Locations {
+    id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    suburb      String
+    postcode    String
+    state       String
+    country     String
+    latitude    Float?
+    longitude   Float?
+    postBox     Float?
+    locality    String?
+    createdAt   DateTime @default(now()) @db.Timestamptz()
+    updatedAt   DateTime @default(now()) @db.Timestamptz()
+    countryCode String?  @default("")
+}

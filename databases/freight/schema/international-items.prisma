@@ -1,0 +1,34 @@
+model InternationalShipmentItem {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  description String
+  tariffCode  String
+  origin      String
+  quantity    Float
+  weight      Float
+  value       Float
+  accountId   String   @db.Uuid
+  contentId   String?  @db.Uuid
+  tenantId    String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz()
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  @@index([tenantId, accountId])
+}
+
+model TariffCode {
+  id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code        String @unique
+  description String
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model OriginCountry {
+  id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  country     String
+  countryCode String @unique
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @default(now()) @updatedAt
+}

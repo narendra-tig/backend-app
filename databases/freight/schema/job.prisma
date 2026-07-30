@@ -1,0 +1,75 @@
+enum Status {
+  ACCEPTED
+  STARTED
+  COMPLETED
+  FAILED
+}
+
+enum Command {
+  GET_QUOTE
+  CREATE_SHIPMENT
+  CREATE_LABEL
+  MANIFEST_SHIPMENTS
+  BOOK_PICKUP
+  UPDATE_SHIPMENT
+}
+
+model Job {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  deadline  DateTime @db.Timestamptz
+  status    Status
+  type      Command
+  accountId String   @db.Uuid
+  tenantId  String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+  message   String?
+
+  tasks Task[]
+}
+
+model Task {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  carrier   String
+  status    Status
+  jobId     String   @db.Uuid
+  tenantId  String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+
+  job          Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  quoteResults TaskQuoteResult[]
+  PickupTask   PickupTask[]
+
+  @@unique([carrier, jobId], name: "carrierRequest")
+}
+
+model TaskQuoteResult {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  priceTotal      Decimal  @db.Money
+  tax             Decimal  @db.Money
+  price           Decimal  @db.Money
+  minBusinessDays Int?
+  maxBusinessDays Int?
+  taskId          String   @db.Uuid
+  tenantId        String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  createdAt       DateTime @default(now()) @db.Timestamptz()
+  surcharges      Json?
+  fuelLevy        Decimal?
+  baseRate        Decimal?
+  eta             Int?
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model PickupTask {
+  pickupId  String   @db.Uuid
+  taskId    String   @db.Uuid
+  tenantId  String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz()
+
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  pickup Pickup @relation(fields: [pickupId], references: [id], onDelete: Cascade)
+
+  @@unique([pickupId, taskId], name: "pickupTaskId")
+}

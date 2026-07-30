@@ -1,0 +1,13 @@
+model EnquiryNotification {
+  id                   String   @id @default(dbgenerated("gen_random_uuid()"))
+  enquiryId            String
+  createdAt            DateTime @default(now()) @db.Timestamptz()
+  updatedAt            DateTime @default(now()) @db.Timestamptz()
+  accountId            String
+  organisationalUnitId String
+  tenantId             String   @db.Uuid
+  status               String?
+
+  @@unique([enquiryId])
+  @@index([tenantId, accountId], map: "idx_enquiry_notification_tenant_account_id")
+}

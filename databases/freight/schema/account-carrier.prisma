@@ -1,0 +1,90 @@
+enum AccountCarrierVisibilityStatus {
+  PUBLIC
+  PRIVATE
+}
+
+enum AccountCarrierStatus {
+  AC_PENDING
+  AC_ACTIVE
+  AC_INACTIVE
+}
+
+enum AccountCarrierChargeAccountType {
+  TENANT_ACCOUNT
+  CUSTOMER_ACCOUNT
+  SHARED_ACCOUNT
+}
+
+model AccountCarrier {
+  id                  String                           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenancyCarrierId    String                           @db.Uuid
+  accountId           String                           @db.Uuid
+  chargeAccountNumber String?
+  nameTag             String?
+  displayName         String?
+  visibilityStatus    AccountCarrierVisibilityStatus
+  quoteExternally     Boolean                          @default(false)
+  status              AccountCarrierStatus             @default(AC_PENDING)
+  accountType         AccountCarrierChargeAccountType?
+  tenantId            String                           @db.Uuid
+  createdAt           DateTime                         @default(now()) @db.Timestamptz()
+  updatedAt           DateTime                         @updatedAt
+  tenancyCarrier      TenancyCarrier                   @relation(fields: [tenancyCarrierId], references: [id], onDelete: Cascade)
+  customerGroups      CustomerGroupCarrier[]
+  services            AccountCarrierService[]
+  carrierConnection   CarrierConnection?
+  config              AccountCarrierConfig?
+  deleted             Boolean                          @default(false)
+}
+
+enum AccountCarrierServiceStatus {
+  ACS_PENDING
+  ACS_ACTIVE
+  ACS_INACTIVE
+}
+
+model AccountCarrierService {
+  id                      String                        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  accountCarrierId        String                        @db.Uuid
+  tenancyCarrierServiceId String                        @db.Uuid
+  tenantId                String                        @db.Uuid
+  status                  AccountCarrierServiceStatus   @default(ACS_PENDING)
+  instructions            String?
+  prefix                  String?
+  rangeMin                Float?
+  rangeMax                Float?
+  internalServiceCode     String?                       @unique
+  nextId                  Float?
+  createdAt               DateTime                      @default(now()) @db.Timestamptz(6)
+  updatedAt               DateTime                      @updatedAt
+  accountCarrier          AccountCarrier                @relation(fields: [accountCarrierId], references: [id], onDelete: Cascade)
+  tenancyCarrierService   TenancyCarrierService         @relation(fields: [tenancyCarrierServiceId], references: [id], onDelete: Cascade)
+  customerGroupServices   CustomerGroupCarrierService[]
+  deleted                 Boolean                       @default(false)
+
+  @@unique([accountCarrierId, tenancyCarrierServiceId])
+}
+
+model AccountCarrierConfig {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  accountCarrierId  String         @db.Uuid
+  tenantId          String         @db.Uuid
+  consignmentPrefix String?
+  consignmentMax    Int?
+  consignmentMin    Int?
+  consignmentNextId Int?
+  manifestPrefix    String?
+  manifestMax       Int?
+  manifestMin       Int?
+  manifestNextId    Int?
+  atlCodePrefix     String?
+  atlCodeMax        Int?
+  atlCodeMin        Int?
+  atlCodeLength     Int?
+  atlCodeNextId     Int?
+  createdAt         DateTime       @default(now()) @db.Timestamptz()
+  updatedAt         DateTime       @updatedAt
+  accountCarrier    AccountCarrier @relation(fields: [accountCarrierId], references: [id], onDelete: Cascade)
+
+  @@unique([accountCarrierId])
+}

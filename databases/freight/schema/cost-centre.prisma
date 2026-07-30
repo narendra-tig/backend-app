@@ -1,0 +1,14 @@
+model CostCentre {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String
+  code            String?
+  description     String?  @db.Text
+  accountId       String   @db.Uuid
+  customerGroupId String?  @db.Uuid
+  tenantId        String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  createdAt       DateTime @default(now()) @db.Timestamptz()
+  updatedAt       DateTime @default(now()) @updatedAt
+
+  @@unique([accountId, name])
+  @@index([tenantId, accountId])
+}

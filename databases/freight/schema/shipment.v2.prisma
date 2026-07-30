@@ -1,0 +1,76 @@
+enum LocationType {
+  RESIDENTIAL
+  BUSINESS
+  DEPOT
+  WAREHOUSE
+  PO_BOX
+}
+
+model NewShipment {
+  id                          String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reference                   String?
+  senderId                    String              @db.Uuid
+  receiverId                  String              @db.Uuid
+  dispatchDate                DateTime            @db.Timestamptz
+  signaturePreference         SignaturePreference
+  billTo                      String
+  carrier                     String
+  serviceName                 String              @default("")
+  serviceId                   String              @default(dbgenerated("'00000000-0000-0000-0000-000000000000'::uuid")) @db.Uuid
+  connectionId                String              @default(dbgenerated("'00000000-0000-0000-0000-000000000000'::uuid")) @db.Uuid
+  pickupInstructions          String?
+  deliveryInstructions        String?
+  customReference             String?
+  status                      ShipmentStatus
+  pickupId                    String?             @db.Uuid
+  createdAt                   DateTime            @default(now()) @db.Timestamptz()
+  tenantId                    String              @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  accountId                   String              @db.Uuid
+  customerGroupId             String              @db.Uuid
+  shipmentReferenceId         String?
+  minBusinessDays             Int?
+  maxBusinessDays             Int?
+  estimatedPrice              Decimal?            @db.Money
+  updatedAt                   DateTime            @default(now()) @updatedAt
+  deleted                     Boolean             @default(false)
+  manifestId                  String?             @db.Uuid
+  consignmentReference        String?
+  internalReference           String?
+  returnCode                  String?
+  customerReference           String?
+  supplierReference           String?
+  configuredSupplierServiceId String?             @db.Uuid
+  trackingNumber              String?
+  handlingInstructions        String?
+  billToName                  String?
+  billToCustomerGroupId       String?             @db.Uuid
+  thirdPartyAccountNumber     String?
+  createdBy                   String?             @db.Uuid
+
+  packages           Package[]
+  palletsManagement  PalletsManagement?
+  paperwork          Paperwork[]
+  pickup             Pickup?                 @relation(fields: [pickupId], references: [id])
+  details            ShipmentDetails?        @relation(fields: [shipmentDetailsId], references: [id])
+  sender             Sender                  @relation(fields: [senderId], references: [id])
+  receiver           Receiver?               @relation(fields: [receiverId], references: [id])
+  manifestShipment   ManifestShipment?       @relation(fields: [manifestId], references: [id])
+  watchlists         Watchlist[]
+  meta               ShipmentMeta?
+  attachments        ShipmentAttachment[]
+  legs               ShipmentLeg[]
+  statusHistory      ShipmentStatusHistory[]
+  pricing            ShipmentPricing[]
+  tracking           ShipmentTracking?       @relation(fields: [shipmentTrackingId], references: [id])
+  international      ShipmentInternational?
+  attributes         ShipmentAttribute[]
+  integration        ShipmentIntegration?
+  notifications      ShipmentNotification[]
+  shipmentDetailsId  String?                 @db.Uuid
+  shipmentTrackingId String?                 @db.Uuid
+
+  @@unique([shipmentReferenceId])
+  @@index([trackingNumber])
+  @@index([customerReference])
+  @@index([supplierReference])
+}

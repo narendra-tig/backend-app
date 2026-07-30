@@ -1,0 +1,23 @@
+model ManifestShipment {
+    id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    manifestDate        DateTime? @db.Timestamptz
+    manifestReferenceId String?
+    carrierName         String?
+    totalConsignment    Int?
+    totalWeight         Decimal?
+    totalVolume         Decimal?
+    totalItems          Int?
+    manifestPaperwork   String?
+    accountId           String    @db.Uuid
+    customerGroupId     String    @db.Uuid
+    tenantId            String    @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+    createdAt           DateTime  @default(now()) @db.Timestamptz()
+    serviceName         String?
+
+    shipments    Shipment[]
+    newShipments NewShipment[]
+
+    @@unique([manifestReferenceId])
+    @@index([serviceName])
+    @@index([carrierName])
+}

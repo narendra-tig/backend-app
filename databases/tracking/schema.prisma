@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../../models/tracking"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Shipment {
+  shipmentId     String   @id @db.Uuid
+  carrier        String?  @db.Text
+  consignmentId  String?  @db.Text
+  isDelivered    Boolean  @default(false) @db.Boolean
+  notifiedEvents String[]
+  connectionId   String   @db.Uuid
+  accountId      String   @db.Uuid
+  tenantId       String   @db.Uuid
+  data           Json?
+  createdAt      DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt
+
+  trackingEvents TrackingEvent[]
+
+  @@unique([shipmentId])
+}
+
+model TrackingEvent {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  location        String   @db.Text
+  packageRef      String?  @db.Text
+  consignment     String?  @db.Text
+  trackingEventId String   @db.Uuid
+  createdAt       DateTime @default(now()) @db.Timestamptz()
+  updatedAt       DateTime @updatedAt
+  tenantId        String   @db.Uuid
+
+  shipmentId String   @db.Uuid
+  Shipment   Shipment @relation(fields: [shipmentId], references: [shipmentId], onDelete: Cascade)
+}

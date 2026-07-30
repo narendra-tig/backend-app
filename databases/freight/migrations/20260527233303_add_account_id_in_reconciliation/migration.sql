@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "ReconciliationHistory" ADD COLUMN     "accountId" UUID NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'::uuid;

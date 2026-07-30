@@ -1,0 +1,292 @@
+enum UserStatus {
+    PENDING  @map("pending")
+    INVITED  @map("invited")
+    ACTIVE   @map("active")
+    INACTIVE @map("inactive")
+}
+
+enum UserType {
+    ROOT    @map("root")
+    TENANCY @map("tenancy")
+    ACCOUNT @map("account")
+    HUB     @map("hub")
+}
+
+enum PrinterType {
+    THERMAL
+    CLOUD
+    PDF
+}
+
+model User {
+    id                                String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    email                             String
+    firstName                         String
+    lastName                          String
+    isVerified                        Boolean    @default(false)
+    status                            UserStatus
+    type                              UserType
+    firebaseId                        String?
+    jobTitle                          String?
+    phoneNumber                       String?
+    createdAt                         DateTime   @default(now()) @db.Timestamptz()
+    updatedAt                         DateTime   @updatedAt
+    avatar                            String?
+    organisationalUnitId              String     @db.Uuid
+    tenantId                          String     @db.Uuid
+    fullName                          String?    @default("")
+    opt                               Boolean?   @default(false)
+    ofId                              Int?
+    ofUuid                            String?    @db.Uuid
+    primaryApp                        String?
+    primaryCustomerGroupId            String?    @db.Uuid // Account users need to know a primary CG
+    isAcceptedPolicies                Boolean    @default(false)
+    isImpersonationEnabled            Boolean    @default(false)
+    isAccessingCustomerAccountEnabled Boolean    @default(false) // Indicates if the user can access customer accounts
+    isSSOEnabled                      Boolean    @default(false)
+    isMFAEnabled                      Boolean    @default(false)
+    applicationAccess                 String[] // Store app keys & IDs as key-value pairs (e.g., `["'key':'tenancy', 'value':'Tenant App'"     ]`)
+    userAttributes                    Json? // e.g.,  third-party metadata
+    ofUserId                          String?    @db.Uuid
+    signature                         String?    @default("")
+    signaturePath                     String?    @default("")
+    homePreferenceCode                String?    @db.Text
+    timezone                          String?    @default("Australia/Melbourne")
+    ssoAccountCode                    String?    @default("")
+    expiresAt                         DateTime?  @db.Timestamptz()
+    deletedAt                         DateTime?  @db.Timestamptz()
+
+    organisationalUnit    OrganisationalUnit     @relation(fields: [organisationalUnitId], references: [id], onDelete: Cascade)
+    tenant                Tenant                 @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+    accessibilitySettings AccessibilitySettings?
+    systemUsers           SystemUser[]
+    timeToken             TimedToken[]
+    tenancyUser           TenancyUser[]
+    accountUser           AccountUser[]
+    hubUser               HubUser?
+    printerSettings       PrinterSetting?
+    DocumentSetting       DocumentSetting?
+    customTableSetting    CustomTableSetting[]
+    CustomViews           CustomViews[]
+    homePreference        HomePreference?        @relation(fields: [homePreferenceCode], references: [code])
+
+    UserCredentials UserCredentials?
+    UserSession     UserSession[]
+    preferences     Preference[]
+    defaultAccount  UserDefaultAccount[]
+
+    @@unique(fields: [email, tenantId], name: "tenantedEmail")
+    @@index([tenantId])
+    @@index([organisationalUnitId])
+}
+
+enum TextSize {
+    SMALL  @map("small")
+    MEDIUM @map("medium")
+    LARGE  @map("large")
+}
+
+enum ColourMode {
+    LIGHT @map("light")
+    DARK  @map("dark")
+}
+
+enum Spacing {
+    REGULAR @map("regular")
+    COMPACT @map("compact")
+}
+
+model AccessibilitySettings {
+    id               String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    textSize         TextSize   @default(MEDIUM)
+    colourMode       ColourMode @default(LIGHT)
+    spacing          Spacing    @default(REGULAR)
+    createdAt        DateTime   @default(now()) @db.Timestamptz()
+    updatedAt        DateTime   @updatedAt
+    userId           String     @unique @db.Uuid
+    tenantId         String     @db.Uuid
+    sidebarCollapsed Boolean    @default(false)
+
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model SystemUser {
+    id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    userId          String   @db.Uuid
+    accountId       String?  @db.Uuid
+    tenantId        String   @db.Uuid
+    systemUserId    String   @db.Uuid
+    type            UserType
+    systemUserEmail String
+    createdAt       DateTime @default(now()) @db.Timestamptz()
+    updatedAt       DateTime @updatedAt
+
+    user User? @relation(fields: [systemUserId], references: [id], onDelete: Cascade)
+}
+
+model TenancyUser {
+    id                       String  @id @default(dbgenerated("gen_random_uuid()"))
+    userId                   String  @db.Uuid
+    isCompletedOnboarding    Boolean @default(false)
+    tenantId                 String  @db.Uuid
+    tenantOrganisationUnitId String? @db.Uuid
+
+    user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, tenantId], name: "tenancyUserUniqueConstraint")
+}
+
+model AccountUser {
+    id                        String  @id @default(dbgenerated("gen_random_uuid()"))
+    userId                    String  @db.Uuid
+    isCompletedOnboarding     Boolean @default(false)
+    isAcceptedPolicies        Boolean @default(false)
+    tenantId                  String  @db.Uuid
+    accountId                 String? @db.Uuid
+    accountOrganisationUnitId String? @db.Uuid
+
+    user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model HubUser {
+    id                    String  @id @default(dbgenerated("gen_random_uuid()"))
+    userId                String  @db.Uuid
+    isCompletedOnboarding Boolean @default(false)
+    tenantId              String  @db.Uuid
+
+    user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([userId])
+}
+
+model PrinterSetting {
+    id        String      @id @default(dbgenerated("gen_random_uuid()"))
+    userId    String      @db.Uuid
+    type      PrinterType
+    printerId String
+    name      String
+    margin    Float
+    createdAt DateTime    @default(now()) @db.Timestamptz()
+    tenantId  String      @db.Uuid
+    isCustom  Boolean     @default(false)
+    darkness  Int?        @default(0)
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([userId])
+}
+
+model TermsAndConditions {
+    id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    content   String?
+    createdAt DateTime @default(now()) @db.Timestamptz()
+    updatedAt DateTime @updatedAt
+}
+
+model DocumentSetting {
+    id        String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    userId    String       @db.Uuid
+    printerId String
+    createdAt DateTime     @default(now()) @db.Timestamptz()
+    tenantId  String       @db.Uuid
+    isCustom  Boolean      @default(false)
+    name      String       @default("")
+    type      PrinterType? @default(PDF)
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([userId])
+}
+
+enum TableType {
+    READY_TO_SHIP
+    MANIFESTS
+    MANIFESTED
+    QUOTE
+    DRAFT
+    PICKUP
+    BULK_IMPORT
+    DELETED
+    RETURN
+    DANGEROUS_GOODS
+    ITEMS
+    ADDRESS_BOOK
+    INTERNATIONAL_ITEMS
+    WATCH_LIST
+    RECONCILIATION
+    BULK_IMPORT_HISTORY
+    CUSTOMER_GROUP_SERVICES_PRINTING_PREFERENCE
+}
+
+model CustomTableSetting {
+    id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    type      TableType @default(READY_TO_SHIP)
+    data      Json?
+    userId    String    @db.Uuid
+    createdAt DateTime  @default(now()) @db.Timestamptz()
+    updatedAt DateTime  @updatedAt
+    deletedAt DateTime? @db.Timestamptz(6)
+    tenantId  String    @db.Uuid
+    rowCount  Int?
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, type], name: "custom_user_type")
+}
+
+model CustomViews {
+    id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    name        String
+    tableName   String
+    data        Json?
+    filtersData Json?
+    userId      String    @db.Uuid
+    createdAt   DateTime  @default(now()) @db.Timestamptz()
+    updatedAt   DateTime  @updatedAt
+    deletedAt   DateTime? @db.Timestamptz(6)
+    tenantId    String    @db.Uuid
+    accountId   String?
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model HomePreference {
+    id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    name      String
+    code      String
+    createdAt DateTime @default(now()) @db.Timestamptz()
+    updatedAt DateTime @updatedAt
+
+    users User[]
+
+    @@unique([code])
+}
+
+model Preference {
+    id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    importType String
+    userId     String   @db.Uuid
+    createdAt  DateTime @default(now()) @db.Timestamptz()
+    tenantId   String   @db.Uuid
+    updatedAt  DateTime @updatedAt
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, tenantId], name: "preference_user_tenant")
+}
+
+model UserDefaultAccount {
+    id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    userId    String   @db.Uuid
+    accountId String   @db.Uuid
+    tenantId  String   @db.Uuid
+    createdAt DateTime @default(now()) @db.Timestamptz()
+    updatedAt DateTime @updatedAt
+
+    user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, accountId], name: "userDefaultAccountUniqueConstraint")
+    @@index([userId], name: "idx_user_default_account_userId")
+    @@index([tenantId, userId], name: "idx_user_default_account_tenantId_userId")
+}

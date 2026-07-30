@@ -1,0 +1,26 @@
+model DangerousGoods {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contentId String @unique @db.Uuid
+  tenantId  String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  dgClass              String
+  subRiskClass         String?
+  unNumber             Int
+  properShippingName   String
+  technicalName        String?
+  packingGroup         String?
+  packagingInstruction String?
+  hazardLabels         String[]
+
+  isLimitedQuantity    Boolean @default(false)
+  limitedQuantityValue String?
+  marinePollutant      Boolean @default(false)
+
+  emergencyContact     String?
+  emergencyContactName String?
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+
+  content PackageContents @relation(fields: [contentId], references: [id], onDelete: Cascade)
+}

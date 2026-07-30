@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "TableType" ADD VALUE 'BULK_IMPORT';

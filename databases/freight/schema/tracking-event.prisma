@@ -1,0 +1,23 @@
+model PlatformTrackingEvent {
+  id                    String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                  String                 @unique
+  displayName           String
+  tenantId              String?                @db.Uuid
+  createdAt             DateTime               @default(now()) @db.Timestamptz()
+  updatedAt             DateTime?              @updatedAt
+  carrierTrackingEvents CarrierTrackingEvent[]
+}
+
+model CarrierTrackingEvent {
+  id                      String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                    String
+  carrier                 String
+  platformTrackingEventId String                @db.Uuid
+  platformTrackingEvent   PlatformTrackingEvent @relation(fields: [platformTrackingEventId], references: [id], onDelete: Cascade)
+  tenantId                String?               @db.Uuid
+  createdAt               DateTime              @default(now()) @db.Timestamptz()
+  updatedAt               DateTime?             @updatedAt
+  masterCarrierId         String                @db.Uuid
+
+  @@unique([carrier, name], name: "carrierTrackingEvent")
+}

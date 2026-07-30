@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "Command" ADD VALUE 'UPDATE_SHIPMENT';

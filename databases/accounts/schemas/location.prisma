@@ -1,0 +1,64 @@
+enum AddressBookType {
+  BUSINESS
+  RESIDENTIAL
+}
+
+model Location {
+  id                         String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  version                    Int                @default(1)
+  isActive                   Boolean            @default(true)
+  type                       AddressBookType?
+  name                       String
+  description                String
+  dispatch                   Boolean            @default(false)
+  registered                 Boolean            @default(false)
+  business                   Boolean            @default(false)
+  tenantId                   String             @db.Uuid
+  createdAt                  DateTime           @default(now()) @db.Timestamptz()
+  updatedAt                  DateTime           @updatedAt
+  ofAddressId                String?            @db.Uuid
+
+  contacts                   Contact[]
+  address                    Address?
+  accounts                   Account[]          @relation("KeyLocation")
+  customerGroupLocation      CustomerGroupLocation[]
+  receiverLocation           ReceiverLocation[]
+
+  businessName               String?
+  businessAlias              String?
+  businessTaxId              String?
+  businessTaxIdType          TaxIdType?
+  businessPhone              String?
+  businessPhoneCountryCode   String             @default("+61")
+  businessEmail              String?
+  businessCustomsRegistration String?
+  addressFormatted           String?
+  addressLines               String[]
+  locality                   String?
+  administrativeArea         String?
+  subAdministrativeArea      String?
+  postalCode                 String?
+  region                     String?
+  countryCode                String?            @default("AU") @db.Char(2)
+  extGooglePlaceId           String?
+  extHereMapId               String?
+  extTomtomPlaceId           String?
+  extGnafPid                 String?
+  extCorelogicNzId           String?
+  timezone                   String             @default("Australia/Sydney")
+  metaVerified               Boolean            @default(false)
+  metaVerificationLevel      VerificationLevel?
+  metaVerifiedDate           DateTime?          @db.Timestamptz()
+  metaLastUsedDate           DateTime?          @db.Timestamptz()
+  metaNotes                  String?            @db.Text
+  metaInternalReference      String?
+  accountId                  String?            @db.Uuid
+
+  dispatchLocations          DispatchLocation?
+  receiverLocationsV2        ReceiverLocationV2?
+  depotLocations             DepotLocation?
+
+  contactsV2                 LocationContact?
+
+  @@index([tenantId], map: "idx_location_tenant_id")
+}

@@ -1,0 +1,23 @@
+enum RangeStatus {
+    RS_ACTIVE
+    RS_DEPLETED
+}
+
+enum RangeType {
+    RT_SHIPMENT
+    RT_MANIFEST
+}
+
+model RangeManagementId {
+    id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    startId         Int
+    currentId       Int
+    endId           Int
+    status          RangeStatus
+    type            RangeType
+    tenantId        String      @db.Uuid
+    carrierConfigId String      @db.Uuid
+    createdAt       DateTime    @default(now())
+
+    @@unique(fields: [carrierConfigId, type], name: "rangeTypeId")
+}

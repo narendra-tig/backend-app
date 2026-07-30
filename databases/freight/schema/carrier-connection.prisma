@@ -1,0 +1,42 @@
+// Schema for EDI configuration; Different carriers may have different schemas
+// For example, startrack requires username and password
+model CarrierConnectionSchema {
+  id              String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  masterCarrierId String              @unique @db.Uuid
+  schema          Json
+  createdAt       DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime            @updatedAt
+  connections     CarrierConnection[]
+  masterCarrier   MasterCarrier       @relation(fields: [masterCarrierId], references: [id], onDelete: Cascade)
+}
+
+// Contains EDI configuration to authorize request to carrier system
+model CarrierConnection {
+  id                     String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  connectionSchemaId     String                  @db.Uuid
+  tenancyCarrierId       String?                 @unique @db.Uuid
+  accountCarrierId       String?                 @unique @db.Uuid
+  customerGroupCarrierId String?                 @unique @db.Uuid
+  tenantId               String                  @db.Uuid
+  data                   Json
+  deleted                Boolean                 @default(false)
+  createdAt              DateTime                @default(now()) @db.Timestamptz(6)
+  updatedAt              DateTime                @updatedAt
+  accountCarrier         AccountCarrier?         @relation(fields: [accountCarrierId], references: [id], onDelete: Cascade)
+  connectionSchema       CarrierConnectionSchema @relation(fields: [connectionSchemaId], references: [id], onDelete: Cascade)
+  customerGroupCarrier   CustomerGroupCarrier?   @relation(fields: [customerGroupCarrierId], references: [id], onDelete: Cascade)
+  tenancyCarrier         TenancyCarrier?         @relation(fields: [tenancyCarrierId], references: [id], onDelete: Cascade)
+}
+
+// Globally unique internal service code for reference in public-api
+// Example: STREXP-1
+model InternalServiceCode {
+  id                            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  uniqueNumber                  Int      @default(autoincrement())
+  serviceCode                   String
+  customerGroupCarrierServiceId String?  @unique @db.Uuid
+  accountCarrierServiceId       String?  @unique @db.Uuid
+  tenantId                      String   @db.Uuid
+  createdAt                     DateTime @default(now()) @db.Timestamptz()
+  updatedAt                     DateTime @updatedAt
+}

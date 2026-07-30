@@ -1,0 +1,44 @@
+enum PricingType {
+  QUOTED
+  ACCEPTED
+  BILLED
+  ESTIMATED
+}
+
+model ShipmentPricing {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  shipmentId String @db.Uuid
+  tenantId   String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  configuredSupplierServiceId String?     @db.Uuid
+  type                        PricingType
+
+  baseCost       Decimal @db.Money
+  fuelTotal      Decimal @default(0) @db.Money
+  surchargeTotal Decimal @default(0) @db.Money
+  taxTotal       Decimal @default(0) @db.Money
+  totalCost      Decimal @db.Money
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+
+  shipment      Shipment           @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  surcharges    PricingSurcharge[]
+  newShipment   NewShipment?       @relation(fields: [newShipmentId], references: [id])
+  newShipmentId String?            @db.Uuid
+
+  @@index([shipmentId, type])
+}
+
+model PricingSurcharge {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pricingId String @db.Uuid
+  tenantId  String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  code      String
+  amount    Decimal @db.Money
+  packageId String? @db.Uuid
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+
+  pricing ShipmentPricing @relation(fields: [pricingId], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,163 @@
+enum CustomerGroupStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model CustomerGroup {
+  id                         String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  billingCode                Int                 @default(autoincrement())
+  type                       String
+  organisationalUnitId       String              @unique @db.Uuid
+  status                     CustomerGroupStatus
+  createdAt                  DateTime            @default(now()) @db.Timestamptz()
+  updatedAt                  DateTime            @updatedAt
+  accountId                  String              @db.Uuid
+  tenantId                   String              @db.Uuid
+  ofCustomerGroupId          String?             @db.Uuid
+  ofCustomerGroupBillingCode Int?
+
+  account                    Account                                  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  customerGroupLocations     CustomerGroupLocation[]
+  BillingProfile             BillingProfile?                          @relation(fields: [billingProfileId], references: [id])
+  billingProfileId           String?                                  @db.Uuid
+  settings                   CustomerGroupSettings?
+  printerSettings            PrinterSetting?
+  DocumentSetting            DocumentSetting?
+  Invoices                   Invoices[]
+  shipmentPrintingPresets    ShipmentPrintingPresets[]
+  servicePrintingPreferences CustomerGroupServicePrintingPreference[]
+  customerGroupBilling       CustomerGroupBilling?
+
+  @@index([tenantId, accountId], map: "idx_customer_group_tenant_account_id")
+}
+
+model CustomerGroupSettings {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customerGroupId String   @unique @db.Uuid
+  tenantId        String   @db.Uuid
+  createdAt       DateTime @default(now()) @db.Timestamptz()
+  updatedAt       DateTime @updatedAt
+
+  smsEnabled                                    Boolean @default(false)
+  trackingNotificationManifestedEnabled         Boolean @default(false)
+  trackingNotificationOnboardForDeliveryEnabled Boolean @default(false)
+  trackingNotificationDeliveredEnabled          Boolean @default(false)
+  isEmailEnabled                                Boolean @default(false)
+  notifyReceiverManifested                      Boolean @default(false)
+  notifySenderManifested                        Boolean @default(false)
+  notifyReceiverOnboard                         Boolean @default(false)
+  notifySenderOnboard                           Boolean @default(false)
+  notifyReceiverDelivered                       Boolean @default(false)
+  notifySenderDelivered                         Boolean @default(false)
+  notifyReceiverPod                             Boolean @default(false)
+  notifySenderPod                               Boolean @default(false)
+  notifyReceiverTransitDelay                    Boolean @default(false)
+  notifySenderTransitDelay                      Boolean @default(false)
+  notifyReceiverProblem                         Boolean @default(false)
+  notifySenderProblem                           Boolean @default(false)
+
+  customerGroup         CustomerGroup          @relation(fields: [customerGroupId], references: [id], onDelete: Cascade)
+  emailTemplateSettings EmailTemplateSetting[]
+}
+
+model CustomerGroupLocation {
+  customerGroupId String        @db.Uuid
+  locationId      String        @db.Uuid
+  tenantId        String        @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  customerGroup   CustomerGroup @relation(fields: [customerGroupId], references: [id], onDelete: Cascade)
+  location        Location      @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([customerGroupId, locationId], name: "custmerGroupLocationId")
+}
+
+enum CustomerGroupPrinterType {
+  CG_THERMAL
+  CG_CLOUD
+  CG_PDF
+}
+
+model PrinterSetting {
+  id              String                   @id @default(dbgenerated("gen_random_uuid()"))
+  customerGroupId String                   @db.Uuid
+  type            CustomerGroupPrinterType
+  printerId       String
+  name            String
+  margin          Float
+  createdAt       DateTime                 @default(now()) @db.Timestamptz()
+  tenantId        String                   @db.Uuid
+  darkness        Int?                     @default(0)
+
+  customerGroup CustomerGroup @relation(fields: [customerGroupId], references: [id], onDelete: Cascade)
+
+  @@unique([customerGroupId])
+}
+
+model DocumentSetting {
+  id              String                    @id @default(dbgenerated("gen_random_uuid()"))
+  customerGroupId String                    @db.Uuid
+  printerId       String
+  createdAt       DateTime                  @default(now()) @db.Timestamptz()
+  tenantId        String                    @db.Uuid
+  name            String                    @default("")
+  type            CustomerGroupPrinterType? @default(CG_PDF)
+
+  customerGroup CustomerGroup @relation(fields: [customerGroupId], references: [id], onDelete: Cascade)
+
+  @@unique([customerGroupId])
+}
+
+model CustomerGroupServicePrintingPreference {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customerGroupId     String   @db.Uuid
+  tenantId            String   @db.Uuid
+  carrierId           String   @db.Uuid
+  carrierName         String
+  serviceId           String   @db.Uuid
+  serviceCode         String?
+  serviceName         String?
+  recordName          String?
+  labelPrinterId      String?
+  labelPrinterName    String?
+  labels              Int      @default(1)
+  printerType         String?
+  specialInstructions String?
+  cubic               Float?
+  rangeLeft           Float?
+  notes               String?
+  createdAt           DateTime @default(now()) @db.Timestamptz()
+  updatedAt           DateTime @updatedAt
+
+  customerGroup CustomerGroup @relation(fields: [customerGroupId], references: [id], onDelete: Cascade)
+
+  @@unique([customerGroupId, serviceId])
+}
+
+model EmailTemplateSetting {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  subject         String
+  body            String
+  tenantId        String    @db.Uuid
+  customerGroupId String    @db.Uuid
+  createdAt       DateTime  @default(now()) @db.Timestamptz()
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  customerGroupSettings CustomerGroupSettings? @relation(fields: [customerGroupId], references: [customerGroupId], onDelete: Cascade)
+
+  @@unique([customerGroupId, subject], name: "customerGroupId_subject")
+}
+
+model ShipmentPrintingPresets {
+  id                   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  presetName           String
+  tenantId             String   @db.Uuid
+  customerGroupId      String   @db.Uuid
+  ofCustomerGroupId    String?  @db.Uuid
+  printOrderSelections Json[]
+  createdAt            DateTime @default(now()) @db.Timestamptz()
+  updatedAt            DateTime @updatedAt
+
+  customerGroup CustomerGroup @relation(fields: [customerGroupId], references: [id], onDelete: Cascade)
+
+  @@unique([customerGroupId, presetName], name: "customerGroupId_presetName")
+}

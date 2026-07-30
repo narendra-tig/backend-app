@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "ResourceType" ADD VALUE 'RATE_CARD_DOWNLOAD';

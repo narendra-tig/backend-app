@@ -1,0 +1,234 @@
+enum AccountStatus {
+  PENDING
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum AccountStanding {
+  HEALTHY
+  STANDARD
+  NEW
+  HYPERCARE
+}
+
+enum AccountGrade {
+  A
+  B
+  C
+  D
+  X
+}
+
+enum AccountType {
+  MANAGED
+  SAAS
+  B2B
+  B2C
+}
+
+model Account {
+  id                     String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ofAccountId            String?                 @db.Uuid
+  name                   String                  @unique
+  displayName            String
+  icon                   String?
+  backgroundImage        String?
+  about                  String?
+  createdAt              DateTime                @default(now()) @db.Timestamptz()
+  updatedAt              DateTime                @updatedAt
+  customerGroupId        String?                 @db.Uuid
+  tenantId               String                  @db.Uuid
+  status                 AccountStatus           @default(PENDING)
+  billingCode            Int?
+  ofBillingCode          Int?
+  logo                   String?                 @default("")
+  links                  AccountLink[]
+  customerGroups         CustomerGroup[]
+  receivers              Receiver[]
+  keyLocations           Location[]              @relation("KeyLocation")
+  integrations           Integration[]
+  BillingProfile         BillingProfile[]
+  accountSettings        AccountSettings?
+  CustomPackage          CustomPackage[]
+  dangerousGoods         DangerousGoods[]
+  dangerousGoodsContact  DangerousGoodsContact[]
+  isMFAEnabled           Boolean                 @default(false)
+  isSSOEnabled           Boolean                 @default(false)
+  ofTenancy              String?
+  standing               AccountStanding?
+  grade                  AccountGrade?
+  accountRoleAssignments AccountRoleAssignment[]
+  notes                  Note[]
+  type                   AccountType             @default(MANAGED)
+
+  @@index([tenantId, status], map: "idx_account_tenant_status")
+}
+
+model AccountSettings {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  accountId String   @unique @db.Uuid
+  tenantId  String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+
+  smsEnabled Boolean @default(false)
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+}
+
+model AccountLink {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  url         String
+  displayName String
+  createdAt   DateTime @default(now()) @db.Timestamptz()
+  updatedAt   DateTime @updatedAt
+  accountId   String   @db.Uuid
+  tenantId    String   @db.Uuid
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+}
+
+model Integration {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  url         String
+  displayName String
+  tenantId    String   @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz()
+  updatedAt   DateTime @updatedAt
+
+  accountId String  @db.Uuid
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+}
+
+model PlatformTokenManagement {
+  id                   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  token                String   @unique
+  tokenName            String
+  tenantId             String   @db.Uuid
+  createdAt            DateTime @default(now()) @db.Timestamptz()
+  accountId            String   @db.Uuid
+  carrierConnectionIds String[]
+  carrierNames         String[]
+}
+
+enum RoleAssignmentType {
+  SALES_REP
+  FREIGHT_INVESTIGATOR
+  FREIGHT_ADVISOR
+  PORTFOLIO_OWNER
+}
+
+model AccountRoleAssignment {
+  id        String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  accountId String             @db.Uuid
+  userId    String             @db.Uuid
+  roleId    String             @db.Uuid
+  type      RoleAssignmentType
+  tenantId  String             @db.Uuid
+  createdAt DateTime           @default(now()) @db.Timestamptz()
+  updatedAt DateTime           @updatedAt
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, roleId], name: "accountId_roleId")
+  @@index([accountId], map: "idx_account_role_assignment_accountId")
+}
+
+model AccountRoleMapping {
+  id        String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  roleId    String             @db.Uuid
+  accountId String             @db.Uuid
+  type      RoleAssignmentType
+  tenantId  String             @db.Uuid
+  createdAt DateTime           @default(now()) @db.Timestamptz()
+  updatedAt DateTime           @updatedAt
+
+  @@unique([accountId, roleId, type], name: "accountId_roleId_type")
+  @@index([accountId], map: "idx_account_role_mapping_accountId")
+}
+
+model Note {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  accountId String   @db.Uuid
+  createdBy String   @db.Uuid
+  content   String
+  tenantId  String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+  isPinned  Boolean  @default(false)
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId], map: "idx_note_accountId")
+}
+
+
+
+model Receiver {
+  id                  String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId            String          @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+  accountId           String          @db.Uuid
+  name                String
+  specialInstructions String?
+  authorityToLeave    Boolean         @default(false)
+  thirdPartyAccount   String?
+  serviceId           String?         @db.Uuid
+  carrierId           String?         @db.Uuid
+  connectionId        String?         @db.Uuid
+  createdAt           DateTime        @default(now()) @db.Timestamptz()
+  updatedAt           DateTime        @updatedAt
+  code                String?         @default("")
+  billTo              ReceiverBillTo? @default(NONE)
+  receiverPayAccount  String?
+  ofAddressId         String?         @db.Uuid
+  specialServices     String[]        @default([])
+
+  Account           Account            @relation(fields: [accountId], references: [id])
+  receiverLocations ReceiverLocation[]
+}
+
+model ReceiverLocation {
+  receiverId String @db.Uuid
+  locationId String @db.Uuid
+  tenantId   String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  receiver Receiver @relation(fields: [receiverId], references: [id], onDelete: Cascade)
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([receiverId, locationId], name: "receiverLocationId")
+}
+
+model Contact {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name             String
+  email            String
+  additionalEmails String[]
+  phoneNumber      String
+  locationId       String   @db.Uuid
+  tenantId         String   @db.Uuid
+  createdAt        DateTime @default(now()) @db.Timestamptz()
+  updatedAt        DateTime @updatedAt
+
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+}
+
+model Address {
+  id           String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  locationId   String           @unique @db.Uuid
+  addressLine1 String
+  addressLine2 String?
+  addressLine3 String?
+  suburb       String
+  state        String
+  postcode     String
+  country      String
+  type         AddressBookType? @default(BUSINESS)
+  tenantId     String           @db.Uuid
+  createdAt    DateTime         @default(now()) @db.Timestamptz()
+  updatedAt    DateTime         @updatedAt
+  countryName  String?          @default("")
+  countryCode  String?          @default("")
+
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+}

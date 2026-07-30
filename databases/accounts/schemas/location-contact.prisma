@@ -1,0 +1,16 @@
+model LocationContact {
+  id               String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  locationId       String      @db.Uuid
+  name             String
+  role             ContactRole
+  phone            String?
+  phoneCountryCode String?     @default("+61")
+  email            String?
+  preferredLanguage String?    @default("en")
+  isPrimary        Boolean     @default(false)
+  createdAt        DateTime    @default(now()) @db.Timestamptz()
+
+  location Location @relation(fields: [locationId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([locationId])
+}

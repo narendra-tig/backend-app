@@ -1,0 +1,18 @@
+enum RuleType {
+  RT_SURCHARGE
+}
+
+enum RuleEntity {
+  RE_SHIPMENT
+}
+
+model Rule {
+  id       String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String
+  type     RuleType
+  entity   RuleEntity
+  data     Json
+  tenantId String     @db.Uuid
+
+  surcharges Surcharge[]
+}

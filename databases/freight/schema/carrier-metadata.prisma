@@ -1,0 +1,9 @@
+model ShipmentMetadata {
+  shipmentId String    @id @db.Uuid
+  carrier    String
+  metadata   Json
+  indexIds   String[]
+  tenantId   String    @db.Uuid
+  createdAt  DateTime  @default(now()) @db.Timestamptz()
+  updatedAt  DateTime? @updatedAt
+}

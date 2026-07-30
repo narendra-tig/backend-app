@@ -1,0 +1,73 @@
+enum TradeDirection {
+  EXPORT
+  IMPORT
+  DOMESTIC
+}
+
+model ShipmentInternational {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  shipmentId String @unique @db.Uuid
+  tenantId   String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  isInternational Boolean        @default(true)
+  tradeDirection  TradeDirection
+  exportCountry   String?
+  importCountry   String?
+
+  incoterm                    String?
+  customsValue                Decimal?
+  customsCurrency             String?   @default("AUD")
+  commercialInvoiceNumber     String?
+  commercialInvoiceDate       DateTime? @db.Date
+  exportDeclarationNumber     String?
+  preferentialOriginStatement String?
+
+  exporterName               String?
+  exporterRegistrationNumber String?
+  exporterTaxId              String?
+  exporterCountry            String?
+
+  importerName               String?
+  importerRegistrationNumber String?
+  importerTaxId              String?
+  importerCountry            String?
+
+  customsBrokerName      String?
+  customsBrokerReference String?
+  customsBrokerContact   String?
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+
+  shipment NewShipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+}
+
+model PackageInternational {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  packageId String @unique @db.Uuid
+  tenantId  String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  exportDeclarationNumber String?
+  value                   Decimal?
+  valueCurrency           String?  @default("AUD")
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+
+  package Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
+}
+
+model ContentInternational {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contentId String @unique @db.Uuid
+  tenantId  String @default(dbgenerated("(current_setting('app.tenant_id'::text))::uuid")) @db.Uuid
+
+  exportDescription   String?
+  exportHsCode        String?
+  exportOriginCountry String?
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt
+
+  content PackageContents @relation(fields: [contentId], references: [id], onDelete: Cascade)
+}
