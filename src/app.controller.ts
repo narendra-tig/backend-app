@@ -1,12 +1,14 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
+import { TypedRoute } from '@nestia/core';
+import type { HealthResponse } from './contracts';
 import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @TypedRoute.Get()
+  health(): HealthResponse {
+    return this.appService.health();
   }
 }

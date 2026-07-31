@@ -11,7 +11,7 @@ export class CorePrismaService
     const connectionString = process.env.CORE_DATABASE_URL;
 
     if (!connectionString) {
-      throw new Error('DATABASE_URL is not defined');
+      throw new Error('CORE_DATABASE_URL is not defined');
     }
 
     const isPrismaUrl = /^prisma(?:\+postgres)?:\/\//.test(connectionString);

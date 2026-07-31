@@ -11,7 +11,7 @@ export class AccountsPrismaService
     const connectionString = process.env.ACCOUNTS_DATABASE_URL;
 
     if (!connectionString) {
-      throw new Error('DATABASE_URL is not defined');
+      throw new Error('ACCOUNTS_DATABASE_URL is not defined');
     }
 
     const isPrismaUrl = /^prisma(?:\+postgres)?:\/\//.test(connectionString);

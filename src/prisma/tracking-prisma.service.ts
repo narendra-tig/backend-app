@@ -11,7 +11,7 @@ export class TrackingPrismaService
     const connectionString = process.env.TRACKING_DATABASE_URL;
 
     if (!connectionString) {
-      throw new Error('DATABASE_URL is not defined');
+      throw new Error('TRACKING_DATABASE_URL is not defined');
     }
 
     const isPrismaUrl = /^prisma(?:\+postgres)?:\/\//.test(connectionString);

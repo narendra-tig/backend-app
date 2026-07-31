@@ -1,0 +1,3885 @@
+{
+  "openapi": "3.1.0",
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "local"
+    }
+  ],
+  "info": {
+    "title": "Open360 Backend API",
+    "version": "1.0.0",
+    "description": "SDK-first modular API for tracking, shipments, returns, accounts, and tenancy.",
+    "license": {
+      "name": "UNLICENSED"
+    }
+  },
+  "components": {
+    "schemas": {
+      "HealthResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "const": "ok",
+            "title": null,
+            "description": null
+          },
+          "service": {
+            "const": "backend-app",
+            "title": null,
+            "description": null
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "service",
+          "timestamp"
+        ],
+        "type": "object"
+      },
+      "AccountSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "backgroundImage": {
+            "type": "string"
+          },
+          "about": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "customerGroupId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "tenantId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "logo": {
+            "type": "string"
+          },
+          "billingCode": {
+            "type": "number"
+          },
+          "isMfaEnabled": {
+            "type": "boolean"
+          },
+          "isSsoEnabled": {
+            "type": "boolean"
+          },
+          "standing": {
+            "type": "string"
+          },
+          "grade": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "displayName",
+          "status",
+          "tenantId",
+          "isMfaEnabled",
+          "isSsoEnabled",
+          "type",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object"
+      },
+      "Branding": {
+        "additionalProperties": false,
+        "properties": {
+          "logo": {
+            "type": "string"
+          },
+          "logoLink": {
+            "type": "string"
+          },
+          "logoPosition": {
+            "oneOf": [
+              {
+                "const": "bottom-center"
+              },
+              {
+                "const": "bottom-left"
+              },
+              {
+                "const": "bottom-right"
+              },
+              {
+                "const": "top-center"
+              },
+              {
+                "const": "top-left"
+              },
+              {
+                "const": "top-right"
+              }
+            ]
+          },
+          "background": {
+            "type": "string"
+          },
+          "heading": {
+            "type": "string"
+          },
+          "theme": {
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "CarrierSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "previousStatus": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "refShortHand": {
+            "type": "string"
+          },
+          "isActivated": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "displayName",
+          "status",
+          "previousStatus",
+          "isActivated",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object"
+      },
+      "PalletsManagement": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "accountNumber": {
+            "type": "string"
+          },
+          "chep": {
+            "type": "number"
+          },
+          "loscam": {
+            "type": "number"
+          },
+          "other": {
+            "type": "number"
+          },
+          "tenantId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "chep",
+          "loscam",
+          "other",
+          "tenantId",
+          "createdAt"
+        ],
+        "type": "object"
+      },
+      "ShipmentAddress": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "addressLine1": {
+            "type": "string"
+          },
+          "addressLine2": {
+            "type": "string"
+          },
+          "suburb": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "postcode": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "countryCode": {
+            "type": "string"
+          },
+          "tenantId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "addressLine1",
+          "suburb",
+          "state",
+          "postcode",
+          "country",
+          "tenantId",
+          "createdAt"
+        ],
+        "type": "object"
+      },
+      "ShipmentContact": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "format": "email",
+            "type": "string"
+          },
+          "additionalEmails": {
+            "items": {
+              "format": "email",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "locationId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "tenantId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "additionalEmails",
+          "locationId",
+          "tenantId",
+          "createdAt"
+        ],
+        "type": "object"
+      },
+      "ShipmentDetails": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "dispatchDate": {
+            "type": "string"
+          },
+          "deliverySignaturePreference": {
+            "type": "string"
+          },
+          "billTo": {
+            "type": "string"
+          },
+          "carrier": {
+            "type": "string"
+          },
+          "serviceName": {
+            "type": "string"
+          },
+          "serviceId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "connectionId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "specialServices": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "pickupInstructions": {
+            "type": "string"
+          },
+          "deliveryInstructions": {
+            "type": "string"
+          },
+          "customReference": {
+            "type": "string"
+          },
+          "consignmentReference": {
+            "type": "string"
+          },
+          "internalReference": {
+            "type": "string"
+          },
+          "eta": {
+            "type": "string"
+          },
+          "thirdPartyAccountNumber": {
+            "type": "string"
+          },
+          "billToCustomerGroupId": {
+            "type": "string"
+          },
+          "totalVolume": {
+            "type": "string"
+          },
+          "totalWeight": {
+            "type": "string"
+          },
+          "totalQuantity": {
+            "type": "number"
+          },
+          "enableItemAsTotal": {
+            "type": "boolean"
+          },
+          "isReturnEmailSent": {
+            "type": "boolean"
+          },
+          "isReturnConfirmed": {
+            "type": "boolean"
+          },
+          "tenantId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "shipmentId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "dispatchDate",
+          "deliverySignaturePreference",
+          "billTo",
+          "carrier",
+          "serviceName",
+          "serviceId",
+          "connectionId",
+          "specialServices",
+          "tenantId",
+          "shipmentId",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object"
+      },
+      "ShipmentLocation": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "addressId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "tenantId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "address": {
+            "$ref": "#/components/schemas/ShipmentAddress"
+          },
+          "contact": {
+            "$ref": "#/components/schemas/ShipmentContact"
+          }
+        },
+        "required": [
+          "id",
+          "addressId",
+          "tenantId",
+          "createdAt",
+          "address"
+        ],
+        "type": "object"
+      },
+      "ShipmentPackage": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "packageType": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "weight": {
+            "type": "string"
+          },
+          "length": {
+            "type": "string"
+          },
+          "width": {
+            "type": "string"
+          },
+          "height": {
+            "type": "string"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "labelQuantity": {
+            "type": "number"
+          },
+          "isEnablePrint": {
+            "type": "boolean"
+          },
+          "tenantId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "packageContents": {
+            "items": {
+              "$ref": "#/components/schemas/ShipmentPackageContent"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "packageType",
+          "quantity",
+          "weight",
+          "length",
+          "width",
+          "height",
+          "labelQuantity",
+          "tenantId",
+          "createdAt",
+          "packageContents"
+        ],
+        "type": "object"
+      },
+      "ShipmentPackageContent": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "packageType": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "weight": {
+            "type": "string"
+          },
+          "dgType": {
+            "type": "string"
+          },
+          "dgId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object"
+      },
+      "ShipmentPaperwork": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "size": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "tag": {
+            "type": "string"
+          },
+          "tenantId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "lastPrintedDate": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "fileName",
+          "size",
+          "reference",
+          "tag",
+          "tenantId",
+          "createdAt",
+          "lastPrintedDate"
+        ],
+        "type": "object"
+      },
+      "ShipmentParty": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "locationId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "tenantId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "isResidential": {
+            "type": "boolean"
+          },
+          "customerGroupId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "specialInstructions": {
+            "type": "string"
+          },
+          "location": {
+            "$ref": "#/components/schemas/ShipmentLocation"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "locationId",
+          "tenantId",
+          "createdAt",
+          "isResidential",
+          "location"
+        ],
+        "type": "object"
+      },
+      "ShipmentPickup": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "pickupReference": {
+            "type": "string"
+          },
+          "pickupDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "readyTime": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "closingTime": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "internalReference": {
+            "type": "string"
+          },
+          "pickupArea": {
+            "type": "string"
+          },
+          "specialInstructions": {
+            "type": "string"
+          },
+          "pickupStatus": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "tenantId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "shipmentId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "pickupReference",
+          "pickupDate",
+          "readyTime",
+          "timezone",
+          "pickupStatus",
+          "tenantId",
+          "createdAt"
+        ],
+        "type": "object"
+      },
+      "ShipmentResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "senderId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "receiverId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "dispatchDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "signaturePreference": {
+            "type": "string"
+          },
+          "billTo": {
+            "type": "string"
+          },
+          "carrier": {
+            "type": "string"
+          },
+          "serviceName": {
+            "type": "string"
+          },
+          "serviceId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "connectionId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "pickupInstructions": {
+            "type": "string"
+          },
+          "deliveryInstructions": {
+            "type": "string"
+          },
+          "customReference": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "pickupId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "tenantId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "accountId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "customerGroupId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "shipmentReferenceId": {
+            "type": "string"
+          },
+          "minBusinessDays": {
+            "type": "number"
+          },
+          "maxBusinessDays": {
+            "type": "number"
+          },
+          "estimatedPrice": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "manifestId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "consignmentReference": {
+            "type": "string"
+          },
+          "internalReference": {
+            "type": "string"
+          },
+          "returnCode": {
+            "type": "string"
+          },
+          "sender": {
+            "$ref": "#/components/schemas/ShipmentParty"
+          },
+          "receiver": {
+            "$ref": "#/components/schemas/ShipmentParty"
+          },
+          "details": {
+            "$ref": "#/components/schemas/ShipmentDetails"
+          },
+          "packages": {
+            "items": {
+              "$ref": "#/components/schemas/ShipmentPackage"
+            },
+            "type": "array"
+          },
+          "paperwork": {
+            "items": {
+              "$ref": "#/components/schemas/ShipmentPaperwork"
+            },
+            "type": "array"
+          },
+          "palletsManagement": {
+            "$ref": "#/components/schemas/PalletsManagement"
+          },
+          "pickup": {
+            "$ref": "#/components/schemas/ShipmentPickup"
+          },
+          "enquiryToken": {
+            "type": "string"
+          },
+          "cutOffTime": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "senderId",
+          "receiverId",
+          "dispatchDate",
+          "signaturePreference",
+          "billTo",
+          "carrier",
+          "serviceName",
+          "serviceId",
+          "connectionId",
+          "status",
+          "createdAt",
+          "tenantId",
+          "accountId",
+          "customerGroupId",
+          "updatedAt",
+          "deleted",
+          "sender",
+          "packages",
+          "paperwork"
+        ],
+        "type": "object"
+      },
+      "TrackingEventResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "shipmentId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "tenantId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "carrier": {
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          },
+          "packageRef": {
+            "type": "string"
+          },
+          "level0": {
+            "$ref": "#/components/schemas/TrackingLevelOfDetail"
+          },
+          "level1": {
+            "$ref": "#/components/schemas/TrackingLevelOfDetail"
+          }
+        },
+        "required": [
+          "shipmentId",
+          "tenantId",
+          "carrier",
+          "timestamp",
+          "location",
+          "level0"
+        ],
+        "type": "object"
+      },
+      "TrackingFacadeResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "shipment": {
+            "$ref": "#/components/schemas/ShipmentResponse"
+          },
+          "tracking": {
+            "items": {
+              "$ref": "#/components/schemas/TrackingEventResponse"
+            },
+            "type": "array"
+          },
+          "account": {
+            "$ref": "#/components/schemas/AccountSummary"
+          },
+          "supplier": {
+            "$ref": "#/components/schemas/CarrierSummary"
+          },
+          "branding": {
+            "$ref": "#/components/schemas/Branding"
+          }
+        },
+        "required": [
+          "shipment",
+          "tracking"
+        ],
+        "type": "object"
+      },
+      "TrackingLevelOfDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "type": "object"
+      },
+      "TenantHeaders": {
+        "additionalProperties": false,
+        "properties": {
+          "x-tenant-id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "x-account-id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "authorization": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "x-tenant-id"
+        ],
+        "type": "object"
+      },
+      "TenantSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "firebaseId": {
+            "type": "string"
+          },
+          "ownerId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "organisationalUnitId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "bucketName": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "firebaseId",
+          "displayName",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object"
+      },
+      "TenantContextResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "tenant": {
+            "$ref": "#/components/schemas/TenantSummary"
+          },
+          "user": {
+            "$ref": "#/components/schemas/TenantUserSummary"
+          },
+          "accountIds": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "tenant",
+          "accountIds"
+        ],
+        "type": "object"
+      },
+      "TenantUserSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "email": {
+            "format": "email",
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "tenantId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "organisationalUnitId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "applicationAccess": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "primaryApp": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "firstName",
+          "lastName",
+          "status",
+          "type",
+          "tenantId",
+          "organisationalUnitId",
+          "applicationAccess",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object"
+      },
+      "TenantContextQuery": {
+        "additionalProperties": false,
+        "properties": {
+          "userId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "TenantUsersResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/TenantUserSummary"
+            },
+            "type": "array"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data",
+          "total"
+        ],
+        "type": "object"
+      },
+      "TenantUsersQuery": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          },
+          "search": {
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "AccountAccessResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "tenantId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "accountId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "hasAccess": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "tenantId",
+          "accountId",
+          "hasAccess"
+        ],
+        "type": "object"
+      },
+      "ShipmentListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/ShipmentResponse"
+            },
+            "type": "array"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data",
+          "total"
+        ],
+        "type": "object"
+      },
+      "ShipmentListQuery": {
+        "additionalProperties": false,
+        "properties": {
+          "accountId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "customerGroupId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "TrackingEventsResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "trackingEvents": {
+            "items": {
+              "$ref": "#/components/schemas/TrackingEventResponse"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "trackingEvents"
+        ],
+        "type": "object"
+      },
+      "TenantInternalHeaders": {
+        "additionalProperties": false,
+        "properties": {
+          "x-tenant-id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "x-account-id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "authorization": {
+            "type": "string"
+          },
+          "x-internal-api-key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "x-tenant-id",
+          "x-internal-api-key"
+        ],
+        "type": "object"
+      },
+      "OkResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "ok": {
+            "const": true,
+            "title": null,
+            "description": null
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "type": "object"
+      },
+      "PersistTrackingEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "shipmentId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "tenantId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          },
+          "packageRef": {
+            "type": "string"
+          },
+          "trackingEventId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "connectionId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "consignmentId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "shipmentId",
+          "tenantId",
+          "timestamp",
+          "location",
+          "trackingEventId"
+        ],
+        "type": "object"
+      },
+      "SaveTrackingEventsRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "trackingBehavior": {
+            "oneOf": [
+              {
+                "const": "OVERRIDE"
+              },
+              {
+                "const": "PUSH"
+              }
+            ]
+          },
+          "tenantId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "shipments": {
+            "items": {
+              "$ref": "#/components/schemas/TrackingShipment"
+            },
+            "type": "array"
+          },
+          "carrier": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "trackingBehavior",
+          "tenantId",
+          "shipments"
+        ],
+        "type": "object"
+      },
+      "TrackingShipment": {
+        "additionalProperties": false,
+        "properties": {
+          "shipmentId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "delivered": {
+            "type": "boolean"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/PersistTrackingEvent"
+            },
+            "type": "array"
+          },
+          "connectionId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "consignmentId": {
+            "type": "string"
+          },
+          "tenantId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "notifiedEvents": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "data": {},
+          "accountId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "carrier": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "shipmentId",
+          "delivered",
+          "events",
+          "connectionId",
+          "tenantId",
+          "notifiedEvents",
+          "accountId"
+        ],
+        "type": "object"
+      },
+      "InternalHeaders": {
+        "additionalProperties": false,
+        "properties": {
+          "x-internal-api-key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "x-internal-api-key"
+        ],
+        "type": "object"
+      },
+      "TrackingShipmentsResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "shipments": {
+            "items": {
+              "$ref": "#/components/schemas/TrackingShipment"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "shipments"
+        ],
+        "type": "object"
+      },
+      "PollTrackingQuery": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "type": "number"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "UpdateDeliveredShipmentRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "delivered": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "delivered"
+        ],
+        "type": "object"
+      },
+      "RegisterTrackingShipmentRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "carrier": {
+            "type": "string"
+          },
+          "consignmentId": {
+            "type": "string"
+          },
+          "connectionId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "accountId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "data": {}
+        },
+        "required": [
+          "carrier",
+          "consignmentId",
+          "connectionId",
+          "accountId"
+        ],
+        "type": "object"
+      },
+      "SaveNotifiedEventRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "isDelivered": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "type": "object"
+      },
+      "ReturnShipmentView": {
+        "additionalProperties": false,
+        "properties": {
+          "shipment": {
+            "$ref": "#/components/schemas/ShipmentResponse"
+          },
+          "tracking": {
+            "items": {
+              "$ref": "#/components/schemas/TrackingEventResponse"
+            },
+            "type": "array"
+          },
+          "account": {
+            "$ref": "#/components/schemas/AccountSummary"
+          },
+          "supplier": {
+            "$ref": "#/components/schemas/CarrierSummary"
+          },
+          "branding": {
+            "$ref": "#/components/schemas/Branding"
+          }
+        },
+        "required": [
+          "shipment",
+          "tracking",
+          "account",
+          "supplier",
+          "branding"
+        ],
+        "type": "object"
+      },
+      "ReturnTokenHeaders": {
+        "additionalProperties": false,
+        "properties": {
+          "x-return-token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "x-return-token"
+        ],
+        "type": "object"
+      },
+      "ValidateReturnResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "returnCode": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "expiresInSeconds": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "returnCode",
+          "token",
+          "expiresInSeconds"
+        ],
+        "type": "object"
+      },
+      "ValidateReturnRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "returnCode": {
+            "type": "string"
+          },
+          "validationNumber": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "returnCode",
+          "validationNumber"
+        ],
+        "type": "object"
+      },
+      "BookReturnRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "sender": {
+            "$ref": "#/components/schemas/ReturnSenderInput"
+          },
+          "packages": {
+            "items": {
+              "$ref": "#/components/schemas/ReturnPackageInput"
+            },
+            "type": "array"
+          },
+          "pickup": {
+            "$ref": "#/components/schemas/ReturnPickupInput"
+          }
+        },
+        "required": [
+          "sender",
+          "packages",
+          "pickup"
+        ],
+        "type": "object"
+      },
+      "ReturnAddressInput": {
+        "additionalProperties": false,
+        "properties": {
+          "addressLine1": {
+            "type": "string"
+          },
+          "addressLine2": {
+            "type": "string"
+          },
+          "suburb": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "postcode": {
+            "type": "string"
+          },
+          "type": {
+            "oneOf": [
+              {
+                "const": "BUSINESS"
+              },
+              {
+                "const": "RESIDENTIAL"
+              }
+            ]
+          },
+          "countryCode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "addressLine1",
+          "suburb",
+          "state",
+          "postcode"
+        ],
+        "type": "object"
+      },
+      "ReturnContactInput": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "format": "email",
+            "type": "string"
+          },
+          "additionalEmails": {
+            "items": {
+              "format": "email",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "phoneNumber": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "email"
+        ],
+        "type": "object"
+      },
+      "ReturnPackageInput": {
+        "additionalProperties": false,
+        "properties": {
+          "reference": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "packageType": {
+            "type": "string"
+          },
+          "weight": {
+            "type": "number"
+          },
+          "length": {
+            "type": "number"
+          },
+          "width": {
+            "type": "number"
+          },
+          "height": {
+            "type": "number"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "packageType",
+          "weight",
+          "length",
+          "width",
+          "height",
+          "quantity"
+        ],
+        "type": "object"
+      },
+      "ReturnPickupInput": {
+        "additionalProperties": false,
+        "properties": {
+          "pickupDate": {
+            "type": "string"
+          },
+          "readyTime": {
+            "type": "string"
+          },
+          "closingTime": {
+            "type": "string"
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "internalReference": {
+            "type": "string"
+          },
+          "pickupArea": {
+            "type": "string"
+          },
+          "specialInstructions": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "pickupDate",
+          "readyTime",
+          "closingTime",
+          "timezone"
+        ],
+        "type": "object"
+      },
+      "ReturnSenderInput": {
+        "additionalProperties": false,
+        "properties": {
+          "address": {
+            "$ref": "#/components/schemas/ReturnAddressInput"
+          },
+          "contact": {
+            "$ref": "#/components/schemas/ReturnContactInput"
+          },
+          "companyName": {
+            "type": "string"
+          },
+          "isResidential": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "address",
+          "contact",
+          "companyName"
+        ],
+        "type": "object"
+      },
+      "SuburbLocation": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "locality": {
+            "type": "string"
+          },
+          "suburb": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "postcode": {
+            "type": "string"
+          },
+          "countryCode": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "latitude": {
+            "type": "number"
+          },
+          "longitude": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "suburb",
+          "state",
+          "postcode",
+          "country"
+        ],
+        "type": "object"
+      },
+      "LocationSearchQuery": {
+        "additionalProperties": false,
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "countryCode": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "EnquiryType": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "value"
+        ],
+        "type": "object"
+      },
+      "CreateTrackingEnquiryResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "ok": {
+            "const": true,
+            "title": null,
+            "description": null
+          },
+          "forwarded": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok",
+          "forwarded"
+        ],
+        "type": "object"
+      },
+      "CreateTrackingEnquiryRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "format": "email",
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "shipmentId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "shipmentReference": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "billingCode": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "phone",
+          "type",
+          "message",
+          "shipmentId",
+          "shipmentReference",
+          "token"
+        ],
+        "type": "object"
+      },
+      "CarrierPackageType": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "masterCarrierId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "carrierName": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "platformType": {
+            "type": "string"
+          },
+          "lengthMin": {
+            "type": "number"
+          },
+          "lengthMax": {
+            "type": "number"
+          },
+          "heightMin": {
+            "type": "number"
+          },
+          "heightMax": {
+            "type": "number"
+          },
+          "widthMin": {
+            "type": "number"
+          },
+          "widthMax": {
+            "type": "number"
+          },
+          "volumeMin": {
+            "type": "number"
+          },
+          "volumeMax": {
+            "type": "number"
+          },
+          "weightMin": {
+            "type": "number"
+          },
+          "weightMax": {
+            "type": "number"
+          },
+          "cubicMin": {
+            "type": "number"
+          },
+          "cubicMax": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "masterCarrierId",
+          "carrierName",
+          "displayName",
+          "name",
+          "platformType"
+        ],
+        "type": "object"
+      },
+      "AccountListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/AccountSummary"
+            },
+            "type": "array"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data",
+          "total"
+        ],
+        "type": "object"
+      },
+      "AccountListQuery": {
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "search": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "UpdateAccountRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "displayName": {
+            "type": "string"
+          },
+          "icon": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "backgroundImage": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "about": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "logo": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "status": {
+            "oneOf": [
+              {
+                "const": "ACTIVE"
+              },
+              {
+                "const": "ARCHIVED"
+              },
+              {
+                "const": "INACTIVE"
+              },
+              {
+                "const": "PENDING"
+              }
+            ]
+          },
+          "isMfaEnabled": {
+            "type": "boolean"
+          },
+          "isSsoEnabled": {
+            "type": "boolean"
+          },
+          "standing": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "const": "HEALTHY"
+              },
+              {
+                "const": "HYPERCARE"
+              },
+              {
+                "const": "NEW"
+              },
+              {
+                "const": "STANDARD"
+              }
+            ]
+          },
+          "grade": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "const": "A"
+              },
+              {
+                "const": "B"
+              },
+              {
+                "const": "C"
+              },
+              {
+                "const": "D"
+              },
+              {
+                "const": "X"
+              }
+            ]
+          },
+          "type": {
+            "oneOf": [
+              {
+                "const": "B2B"
+              },
+              {
+                "const": "B2C"
+              },
+              {
+                "const": "MANAGED"
+              },
+              {
+                "const": "SAAS"
+              }
+            ]
+          }
+        },
+        "required": [],
+        "type": "object"
+      }
+    }
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "health"
+        ],
+        "x-samchon-controller": "AppController"
+      }
+    },
+    "/v1/tracking/shipments/by-reference/{shipmentReference}": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "shipmentReference",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackingFacadeResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "tracking",
+          "shipments",
+          "by_reference",
+          "findByReference"
+        ],
+        "x-samchon-controller": "TrackingFacadeController"
+      }
+    },
+    "/v1/tracking/shipments/{shipmentId}/events": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "shipmentId",
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-account-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TrackingEventResponse"
+                  },
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "tracking",
+          "shipments",
+          "events",
+          "getEvents"
+        ],
+        "x-samchon-controller": "TrackingFacadeController"
+      }
+    },
+    "/v1/tenancy/tenant": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "x-tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-account-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantSummary"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "tenancy",
+          "tenant",
+          "getTenant"
+        ],
+        "x-samchon-controller": "TenancyController"
+      }
+    },
+    "/v1/tenancy/context": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "x-tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-account-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantContextResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "tenancy",
+          "context",
+          "getContext"
+        ],
+        "x-samchon-controller": "TenancyController"
+      }
+    },
+    "/v1/tenancy/users": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "required": false
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "required": false
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "x-tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-account-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantUsersResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "tenancy",
+          "users",
+          "listUsers"
+        ],
+        "x-samchon-controller": "TenancyController"
+      }
+    },
+    "/v1/tenancy/accounts/{accountId}/access": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "x-tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-account-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountAccessResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "tenancy",
+          "accounts",
+          "access",
+          "verifyAccountAccess"
+        ],
+        "x-samchon-controller": "TenancyController"
+      }
+    },
+    "/v1/shipments": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "customerGroupId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "reference",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "required": false
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "required": false
+          },
+          {
+            "name": "x-tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-account-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShipmentListResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "shipments",
+          "list"
+        ],
+        "x-samchon-controller": "ShipmentsController"
+      }
+    },
+    "/v1/shipments/by-reference/{shipmentReference}": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "shipmentReference",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShipmentResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "shipments",
+          "by_reference",
+          "findByReference"
+        ],
+        "x-samchon-controller": "ShipmentsController"
+      }
+    },
+    "/v1/shipments/{shipmentId}": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "shipmentId",
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-account-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShipmentResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "shipments",
+          "findById"
+        ],
+        "x-samchon-controller": "ShipmentsController"
+      }
+    },
+    "/v1/tracking-service/shipments/{shipmentId}/events": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "shipmentId",
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-account-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "x-internal-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackingEventsResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "tracking_service",
+          "shipments",
+          "events",
+          "getTrackingEvents"
+        ],
+        "x-samchon-controller": "TrackingController"
+      }
+    },
+    "/v1/tracking-service/events": {
+      "post": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "x-internal-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveTrackingEventsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "tracking_service",
+          "events",
+          "saveTrackingEvents"
+        ],
+        "x-samchon-controller": "TrackingController"
+      }
+    },
+    "/v1/tracking-service/accounts/{accountId}/shipments": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-account-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "x-internal-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackingShipmentsResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "tracking_service",
+          "accounts",
+          "shipments",
+          "getShipmentsTracking"
+        ],
+        "x-samchon-controller": "TrackingController"
+      }
+    },
+    "/v1/tracking-service/poll": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "required": false
+          },
+          {
+            "name": "x-internal-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackingShipmentsResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "tracking_service",
+          "poll",
+          "getShipmentsForTracking"
+        ],
+        "x-samchon-controller": "TrackingController"
+      }
+    },
+    "/v1/tracking-service/shipments/{shipmentId}/delivery": {
+      "patch": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "shipmentId",
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-account-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "x-internal-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDeliveredShipmentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "tracking_service",
+          "shipments",
+          "delivery",
+          "updateDeliveredShipment"
+        ],
+        "x-samchon-controller": "TrackingController"
+      }
+    },
+    "/v1/tracking-service/shipments/{shipmentId}": {
+      "put": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "shipmentId",
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-account-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "x-internal-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterTrackingShipmentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackingShipment"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "tracking_service",
+          "shipments",
+          "registerTrackingShipment"
+        ],
+        "x-samchon-controller": "TrackingController"
+      },
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "shipmentId",
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-account-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "x-internal-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackingShipment"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "tracking_service",
+          "shipments",
+          "getShipmentTracking"
+        ],
+        "x-samchon-controller": "TrackingController"
+      }
+    },
+    "/v1/tracking-service/shipments/{shipmentId}/notified-events": {
+      "post": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "shipmentId",
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-account-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "x-internal-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveNotifiedEventRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "tracking_service",
+          "shipments",
+          "notified_events",
+          "saveNotifiedEvent"
+        ],
+        "x-samchon-controller": "TrackingController"
+      }
+    },
+    "/v1/tracking/returns/{returnCode}": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "returnCode",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-return-token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnShipmentView"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "tracking",
+          "returns",
+          "findByCode"
+        ],
+        "x-samchon-controller": "ReturnsController"
+      }
+    },
+    "/v1/tracking/returns/validate": {
+      "post": {
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateReturnRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateReturnResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "tracking",
+          "returns",
+          "validate"
+        ],
+        "x-samchon-controller": "ReturnsController"
+      }
+    },
+    "/v1/tracking/returns/{shipmentId}/book": {
+      "post": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "shipmentId",
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-return-token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookReturnRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnShipmentView"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "tracking",
+          "returns",
+          "book"
+        ],
+        "x-samchon-controller": "ReturnsController"
+      }
+    },
+    "/v1/locations/search": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "countryCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "required": false
+          },
+          {
+            "name": "x-tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-account-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SuburbLocation"
+                  },
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "locations",
+          "search"
+        ],
+        "x-samchon-controller": "LocationsController"
+      }
+    },
+    "/v1/tracking/enquiries/types": {
+      "get": {
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EnquiryType"
+                  },
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "tracking",
+          "enquiries",
+          "types",
+          "getTypes"
+        ],
+        "x-samchon-controller": "EnquiriesController"
+      }
+    },
+    "/v1/tracking/enquiries": {
+      "post": {
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTrackingEnquiryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateTrackingEnquiryResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "tracking",
+          "enquiries",
+          "create"
+        ],
+        "x-samchon-controller": "EnquiriesController"
+      }
+    },
+    "/v1/carriers/package-types": {
+      "get": {
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CarrierPackageType"
+                  },
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "carriers",
+          "package_types",
+          "getPackageTypes"
+        ],
+        "x-samchon-controller": "CarriersController"
+      }
+    },
+    "/v1/carriers/by-name/{name}": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarrierSummary"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "carriers",
+          "by_name",
+          "findByName"
+        ],
+        "x-samchon-controller": "CarriersController"
+      }
+    },
+    "/v1/accounts": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "required": false
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "required": false
+          },
+          {
+            "name": "x-tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-account-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountListResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "accounts",
+          "list"
+        ],
+        "x-samchon-controller": "AccountsController"
+      }
+    },
+    "/v1/accounts/by-name/{name}": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountSummary"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "accounts",
+          "by_name",
+          "findByName"
+        ],
+        "x-samchon-controller": "AccountsController"
+      }
+    },
+    "/v1/accounts/{accountId}": {
+      "get": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-account-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountSummary"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "accounts",
+          "findOne"
+        ],
+        "x-samchon-controller": "AccountsController"
+      },
+      "patch": {
+        "tags": [],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "x-account-id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAccountRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountSummary"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "v1",
+          "accounts",
+          "update"
+        ],
+        "x-samchon-controller": "AccountsController"
+      }
+    }
+  },
+  "tags": []
+}

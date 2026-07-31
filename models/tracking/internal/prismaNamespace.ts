@@ -628,6 +628,7 @@ export const TrackingEventScalarFieldEnum = {
   packageRef: 'packageRef',
   consignment: 'consignment',
   trackingEventId: 'trackingEventId',
+  replayKey: 'replayKey',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   tenantId: 'tenantId',

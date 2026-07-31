@@ -1,98 +1,79 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Open360 backend app
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A NestJS modular monolith that exposes the account, tenancy, shipment, public tracking, return, carrier, location, enquiry, and tracking-service contracts through Nestia-generated SDK functions.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Architecture
 
-## Description
+Database providers are deliberately **not global**. Each bounded feature imports only the database module it owns or reads:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+| Feature module | Database modules |
+| --- | --- |
+| Accounts | Accounts |
+| Tenancy | Accounts, Core |
+| Shipments | Freight |
+| Tracking service | Freight, Tracking |
+| Returns | Freight |
+| Carriers | Freight |
+| Locations | Freight |
+| Enquiries | Accounts, Freight through Shipments |
+| Tracking facade | Composes exported feature services; no direct database provider |
 
-## Project setup
+This keeps dependencies visible, prevents unrelated Prisma clients from being created for a feature, and makes provider overrides straightforward in tests.
 
-```bash
-$ pnpm install
-```
+## Authorization boundaries
 
-## Compile and run the project
+- Tenant/account/shipment management calls verify the existing Open360 HS256 session JWT (Bearer token or environment auth cookie) and require its `context.tenantId` to match `x-tenant-id`.
+- `/v1/tracking-service/**` is service-to-service only and requires `x-internal-api-key`. Supply `internalApiKey` to `createBackend` for its SDK methods.
+- Shipment-by-reference, account-by-name, carrier package types, and the public tracking facade remain public for compatibility with the original tracking API. Shipment references therefore remain access secrets and should be high entropy; place rate limiting/WAF controls in front of these routes.
+- Return retrieval and booking require the signed, expiring validation token in `x-return-token`; Nestia exposes this as the endpoint header argument.
 
-```bash
-# development
-$ pnpm run start
+## API groups
 
-# watch mode
-$ pnpm run start:dev
+- `/v1/accounts`
+- `/v1/tenancy`
+- `/v1/shipments`
+- `/v1/tracking/shipments`
+- `/v1/tracking/returns`
+- `/v1/tracking/enquiries`
+- `/v1/tracking-service`
+- `/v1/carriers`
+- `/v1/locations`
 
-# production mode
-$ pnpm run start:prod
-```
+The service-level tracking routes implement the original eight tracking-service operations: event reads/writes, account shipment tracking, polling, delivered status, registration, shipment tracking, and notified-event persistence.
 
-## Run tests
+## SDK
 
-```bash
-# unit tests
-$ pnpm run test
+Nestia generates transport functions under `api/functional`. The checked-in `api/backend.ts` adds connection-bound classes:
 
-# e2e tests
-$ pnpm run test:e2e
+- `Open360Sdk`
+- `AccountsSdk`
+- `TenancySdk`
+- `ShipmentsSdk`
+- `TrackingSdk`
+- `TrackingServiceSdk`
+- `CarriersSdk`
+- `LocationsSdk`
 
-# test coverage
-$ pnpm run test:cov
-```
+Create a client with `createBackend({ host, tenantId, authorization })`. Tenant-scoped calls automatically receive `x-tenant-id`.
 
-## Deployment
+## Environment
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Copy `.env.example` and configure the Accounts, Core, Documents, Freight, and Tracking PostgreSQL URLs. `HELP_DESK_SERVICE_URL` is required only for tracking enquiry submission.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+`TRACKING_ENQUIRIES_SECRET_KEY` and `INTERNAL_API_KEY` must be long random secrets. Production fails closed when token secrets are absent.
 
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
+The help-desk client uses the original gRPC contract. Local development may set `HELP_DESK_GRPC_INSECURE=true`; non-local environments require `HELP_DESK_GRPC_CA_PATH` for TLS. `NOTIFICATIONS_TRACKING_URL` enables the original manifested/onboard/delivered notification dispatch.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Commands
 
-## Resources
+- `pnpm run build` — regenerate SDK, then compile the server with Nestia's `ttsc` transformer.
+- `pnpm run start` — run TypeScript through Nestia's `ttsx` runner.
+- `pnpm run start:prod` — run transformed output.
+- `pnpm run nestia:sdk` — regenerate functional SDK contracts.
+- `pnpm run nestia:swagger` — regenerate OpenAPI 3.1 at `swagger/swagger.json`.
+- `pnpm run sdk:build` — regenerate and compile the publishable SDK package.
+- `pnpm run lint` — lint source and tests.
+- `pnpm run test` — unit tests.
+- `pnpm run test:e2e` — e2e tests with bounded Prisma providers overridden.
 
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Do not replace `ttsc`/`ttsx` with stock `tsc`, `ts-node`, or `nest build`; Nestia typed decorators require their compile-time transformer.

@@ -1,8 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import type { DateTimeString, HealthResponse } from './contracts';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+  health(): HealthResponse {
+    return {
+      status: 'ok',
+      service: 'backend-app',
+      timestamp: new Date().toISOString() as DateTimeString,
+    };
   }
 }

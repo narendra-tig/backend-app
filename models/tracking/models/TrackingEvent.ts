@@ -30,6 +30,7 @@ export type TrackingEventMinAggregateOutputType = {
   packageRef: string | null
   consignment: string | null
   trackingEventId: string | null
+  replayKey: string | null
   createdAt: Date | null
   updatedAt: Date | null
   tenantId: string | null
@@ -42,6 +43,7 @@ export type TrackingEventMaxAggregateOutputType = {
   packageRef: string | null
   consignment: string | null
   trackingEventId: string | null
+  replayKey: string | null
   createdAt: Date | null
   updatedAt: Date | null
   tenantId: string | null
@@ -54,6 +56,7 @@ export type TrackingEventCountAggregateOutputType = {
   packageRef: number
   consignment: number
   trackingEventId: number
+  replayKey: number
   createdAt: number
   updatedAt: number
   tenantId: number
@@ -68,6 +71,7 @@ export type TrackingEventMinAggregateInputType = {
   packageRef?: true
   consignment?: true
   trackingEventId?: true
+  replayKey?: true
   createdAt?: true
   updatedAt?: true
   tenantId?: true
@@ -80,6 +84,7 @@ export type TrackingEventMaxAggregateInputType = {
   packageRef?: true
   consignment?: true
   trackingEventId?: true
+  replayKey?: true
   createdAt?: true
   updatedAt?: true
   tenantId?: true
@@ -92,6 +97,7 @@ export type TrackingEventCountAggregateInputType = {
   packageRef?: true
   consignment?: true
   trackingEventId?: true
+  replayKey?: true
   createdAt?: true
   updatedAt?: true
   tenantId?: true
@@ -177,6 +183,7 @@ export type TrackingEventGroupByOutputType = {
   packageRef: string | null
   consignment: string | null
   trackingEventId: string
+  replayKey: string
   createdAt: Date
   updatedAt: Date
   tenantId: string
@@ -210,6 +217,7 @@ export type TrackingEventWhereInput = {
   packageRef?: Prisma.StringNullableFilter<"TrackingEvent"> | string | null
   consignment?: Prisma.StringNullableFilter<"TrackingEvent"> | string | null
   trackingEventId?: Prisma.UuidFilter<"TrackingEvent"> | string
+  replayKey?: Prisma.StringFilter<"TrackingEvent"> | string
   createdAt?: Prisma.DateTimeFilter<"TrackingEvent"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TrackingEvent"> | Date | string
   tenantId?: Prisma.UuidFilter<"TrackingEvent"> | string
@@ -223,6 +231,7 @@ export type TrackingEventOrderByWithRelationInput = {
   packageRef?: Prisma.SortOrderInput | Prisma.SortOrder
   consignment?: Prisma.SortOrderInput | Prisma.SortOrder
   trackingEventId?: Prisma.SortOrder
+  replayKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
@@ -232,6 +241,7 @@ export type TrackingEventOrderByWithRelationInput = {
 
 export type TrackingEventWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  replayKey?: string
   AND?: Prisma.TrackingEventWhereInput | Prisma.TrackingEventWhereInput[]
   OR?: Prisma.TrackingEventWhereInput[]
   NOT?: Prisma.TrackingEventWhereInput | Prisma.TrackingEventWhereInput[]
@@ -244,7 +254,7 @@ export type TrackingEventWhereUniqueInput = Prisma.AtLeast<{
   tenantId?: Prisma.UuidFilter<"TrackingEvent"> | string
   shipmentId?: Prisma.UuidFilter<"TrackingEvent"> | string
   Shipment?: Prisma.XOR<Prisma.ShipmentScalarRelationFilter, Prisma.ShipmentWhereInput>
-}, "id">
+}, "id" | "replayKey">
 
 export type TrackingEventOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -252,6 +262,7 @@ export type TrackingEventOrderByWithAggregationInput = {
   packageRef?: Prisma.SortOrderInput | Prisma.SortOrder
   consignment?: Prisma.SortOrderInput | Prisma.SortOrder
   trackingEventId?: Prisma.SortOrder
+  replayKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
@@ -270,6 +281,7 @@ export type TrackingEventScalarWhereWithAggregatesInput = {
   packageRef?: Prisma.StringNullableWithAggregatesFilter<"TrackingEvent"> | string | null
   consignment?: Prisma.StringNullableWithAggregatesFilter<"TrackingEvent"> | string | null
   trackingEventId?: Prisma.UuidWithAggregatesFilter<"TrackingEvent"> | string
+  replayKey?: Prisma.StringWithAggregatesFilter<"TrackingEvent"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"TrackingEvent"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"TrackingEvent"> | Date | string
   tenantId?: Prisma.UuidWithAggregatesFilter<"TrackingEvent"> | string
@@ -282,6 +294,7 @@ export type TrackingEventCreateInput = {
   packageRef?: string | null
   consignment?: string | null
   trackingEventId: string
+  replayKey: string
   createdAt?: Date | string
   updatedAt?: Date | string
   tenantId: string
@@ -294,6 +307,7 @@ export type TrackingEventUncheckedCreateInput = {
   packageRef?: string | null
   consignment?: string | null
   trackingEventId: string
+  replayKey: string
   createdAt?: Date | string
   updatedAt?: Date | string
   tenantId: string
@@ -306,6 +320,7 @@ export type TrackingEventUpdateInput = {
   packageRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consignment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trackingEventId?: Prisma.StringFieldUpdateOperationsInput | string
+  replayKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -318,6 +333,7 @@ export type TrackingEventUncheckedUpdateInput = {
   packageRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consignment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trackingEventId?: Prisma.StringFieldUpdateOperationsInput | string
+  replayKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -330,6 +346,7 @@ export type TrackingEventCreateManyInput = {
   packageRef?: string | null
   consignment?: string | null
   trackingEventId: string
+  replayKey: string
   createdAt?: Date | string
   updatedAt?: Date | string
   tenantId: string
@@ -342,6 +359,7 @@ export type TrackingEventUpdateManyMutationInput = {
   packageRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consignment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trackingEventId?: Prisma.StringFieldUpdateOperationsInput | string
+  replayKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -353,6 +371,7 @@ export type TrackingEventUncheckedUpdateManyInput = {
   packageRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consignment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trackingEventId?: Prisma.StringFieldUpdateOperationsInput | string
+  replayKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -375,6 +394,7 @@ export type TrackingEventCountOrderByAggregateInput = {
   packageRef?: Prisma.SortOrder
   consignment?: Prisma.SortOrder
   trackingEventId?: Prisma.SortOrder
+  replayKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
@@ -387,6 +407,7 @@ export type TrackingEventMaxOrderByAggregateInput = {
   packageRef?: Prisma.SortOrder
   consignment?: Prisma.SortOrder
   trackingEventId?: Prisma.SortOrder
+  replayKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
@@ -399,6 +420,7 @@ export type TrackingEventMinOrderByAggregateInput = {
   packageRef?: Prisma.SortOrder
   consignment?: Prisma.SortOrder
   trackingEventId?: Prisma.SortOrder
+  replayKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
@@ -453,6 +475,7 @@ export type TrackingEventCreateWithoutShipmentInput = {
   packageRef?: string | null
   consignment?: string | null
   trackingEventId: string
+  replayKey: string
   createdAt?: Date | string
   updatedAt?: Date | string
   tenantId: string
@@ -464,6 +487,7 @@ export type TrackingEventUncheckedCreateWithoutShipmentInput = {
   packageRef?: string | null
   consignment?: string | null
   trackingEventId: string
+  replayKey: string
   createdAt?: Date | string
   updatedAt?: Date | string
   tenantId: string
@@ -504,6 +528,7 @@ export type TrackingEventScalarWhereInput = {
   packageRef?: Prisma.StringNullableFilter<"TrackingEvent"> | string | null
   consignment?: Prisma.StringNullableFilter<"TrackingEvent"> | string | null
   trackingEventId?: Prisma.UuidFilter<"TrackingEvent"> | string
+  replayKey?: Prisma.StringFilter<"TrackingEvent"> | string
   createdAt?: Prisma.DateTimeFilter<"TrackingEvent"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TrackingEvent"> | Date | string
   tenantId?: Prisma.UuidFilter<"TrackingEvent"> | string
@@ -516,6 +541,7 @@ export type TrackingEventCreateManyShipmentInput = {
   packageRef?: string | null
   consignment?: string | null
   trackingEventId: string
+  replayKey: string
   createdAt?: Date | string
   updatedAt?: Date | string
   tenantId: string
@@ -527,6 +553,7 @@ export type TrackingEventUpdateWithoutShipmentInput = {
   packageRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consignment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trackingEventId?: Prisma.StringFieldUpdateOperationsInput | string
+  replayKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -538,6 +565,7 @@ export type TrackingEventUncheckedUpdateWithoutShipmentInput = {
   packageRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consignment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trackingEventId?: Prisma.StringFieldUpdateOperationsInput | string
+  replayKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -549,6 +577,7 @@ export type TrackingEventUncheckedUpdateManyWithoutShipmentInput = {
   packageRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consignment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trackingEventId?: Prisma.StringFieldUpdateOperationsInput | string
+  replayKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -562,6 +591,7 @@ export type TrackingEventSelect<ExtArgs extends runtime.Types.Extensions.Interna
   packageRef?: boolean
   consignment?: boolean
   trackingEventId?: boolean
+  replayKey?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   tenantId?: boolean
@@ -575,6 +605,7 @@ export type TrackingEventSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   packageRef?: boolean
   consignment?: boolean
   trackingEventId?: boolean
+  replayKey?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   tenantId?: boolean
@@ -588,6 +619,7 @@ export type TrackingEventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   packageRef?: boolean
   consignment?: boolean
   trackingEventId?: boolean
+  replayKey?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   tenantId?: boolean
@@ -601,13 +633,14 @@ export type TrackingEventSelectScalar = {
   packageRef?: boolean
   consignment?: boolean
   trackingEventId?: boolean
+  replayKey?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   tenantId?: boolean
   shipmentId?: boolean
 }
 
-export type TrackingEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "location" | "packageRef" | "consignment" | "trackingEventId" | "createdAt" | "updatedAt" | "tenantId" | "shipmentId", ExtArgs["result"]["trackingEvent"]>
+export type TrackingEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "location" | "packageRef" | "consignment" | "trackingEventId" | "replayKey" | "createdAt" | "updatedAt" | "tenantId" | "shipmentId", ExtArgs["result"]["trackingEvent"]>
 export type TrackingEventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   Shipment?: boolean | Prisma.ShipmentDefaultArgs<ExtArgs>
 }
@@ -629,6 +662,7 @@ export type $TrackingEventPayload<ExtArgs extends runtime.Types.Extensions.Inter
     packageRef: string | null
     consignment: string | null
     trackingEventId: string
+    replayKey: string
     createdAt: Date
     updatedAt: Date
     tenantId: string
@@ -1062,6 +1096,7 @@ export interface TrackingEventFieldRefs {
   readonly packageRef: Prisma.FieldRef<"TrackingEvent", 'String'>
   readonly consignment: Prisma.FieldRef<"TrackingEvent", 'String'>
   readonly trackingEventId: Prisma.FieldRef<"TrackingEvent", 'String'>
+  readonly replayKey: Prisma.FieldRef<"TrackingEvent", 'String'>
   readonly createdAt: Prisma.FieldRef<"TrackingEvent", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"TrackingEvent", 'DateTime'>
   readonly tenantId: Prisma.FieldRef<"TrackingEvent", 'String'>

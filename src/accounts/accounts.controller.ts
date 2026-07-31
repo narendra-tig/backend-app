@@ -1,32 +1,57 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, UseGuards } from '@nestjs/common';
+import {
+  TypedBody,
+  TypedHeaders,
+  TypedParam,
+  TypedQuery,
+  TypedRoute,
+} from '@nestia/core';
+import type {
+  AccountListQuery,
+  AccountListResponse,
+  AccountSummary,
+  TenantHeaders,
+  UpdateAccountRequest,
+  Uuid,
+} from '../contracts';
+import { tenantIdFrom } from '../common/tenant';
+import { TenantAuthGuard } from '../common/tenant-auth.guard';
 import { AccountsService } from './accounts.service';
 
-@Controller('accounts')
+@Controller('v1/accounts')
 export class AccountsController {
   constructor(private readonly accountsService: AccountsService) {}
 
-  // @Post()
-  // create(@Body() createAccountDto: CreateAccountDto) {
-  //   return this.accountsService.create(createAccountDto);
-  // }
-
-  @Get('findAll')
-  findAll(@Query('tenantId') tenantId: string) {
-    return this.accountsService.findAll(tenantId);
+  @TypedRoute.Get()
+  @UseGuards(TenantAuthGuard)
+  list(
+    @TypedHeaders() headers: TenantHeaders,
+    @TypedQuery() query: AccountListQuery,
+  ): Promise<AccountListResponse> {
+    return this.accountsService.list(tenantIdFrom(headers), query);
   }
 
-  @Get(':accountId')
-  findOne(@Param('accountId') accountId: string) {
-    return this.accountsService.findOne(accountId);
+  @TypedRoute.Get('by-name/:name')
+  findByName(@TypedParam('name') name: string): Promise<AccountSummary> {
+    return this.accountsService.findByName(name);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateAccountDto: UpdateAccountDto) {
-  //   return this.accountsService.update(+id, updateAccountDto);
-  // }
+  @TypedRoute.Get(':accountId')
+  @UseGuards(TenantAuthGuard)
+  findOne(
+    @TypedHeaders() headers: TenantHeaders,
+    @TypedParam('accountId') accountId: Uuid,
+  ): Promise<AccountSummary> {
+    return this.accountsService.findOne(tenantIdFrom(headers), accountId);
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.accountsService.remove(+id);
-  // }
+  @TypedRoute.Patch(':accountId')
+  @UseGuards(TenantAuthGuard)
+  update(
+    @TypedHeaders() headers: TenantHeaders,
+    @TypedParam('accountId') accountId: Uuid,
+    @TypedBody() input: UpdateAccountRequest,
+  ): Promise<AccountSummary> {
+    return this.accountsService.update(tenantIdFrom(headers), accountId, input);
+  }
 }

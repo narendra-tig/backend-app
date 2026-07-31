@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package help_desk;
+
+enum ENQUIRY_STATUS {
+  OPEN = 0;
+  CLOSED = 1;
+}
+
+enum ENQUIRY_PRIORITY {
+  LOW = 0;
+  MEDIUM = 1;
+  HIGH = 2;
+  URGENT = 3;
+}
+
+message Upload {
+  bytes file = 1;
+  string filename = 2;
+  string mimetype = 3;
+  optional string encoding = 4;
+  optional string bucketName = 5;
+}
+
+message CreateEnquiryRequest {
+  string description = 1;
+  string subject = 2;
+  string email = 3;
+  ENQUIRY_STATUS status = 4;
+  string type = 5;
+  ENQUIRY_PRIORITY priority = 6;
+  repeated Upload attachments = 7;
+  optional string bucketName = 8;
+  string organisationalUnitId = 9;
+  string freightDescription = 10;
+  optional string valueOfFreight = 11;
+  optional string receiverContactName = 12;
+  optional string receiverContactDetails = 13;
+  string name = 14;
+  optional string jobTitle = 15;
+  string shipmentId = 16;
+  optional string internalReference = 17;
+  optional bool isLiveChat = 18;
+  int32 billingCode = 19;
+  optional bool isNeedOfData = 20;
+  optional int32 accountBillingCode = 21;
+  optional string phone = 22;
+  optional string shipmentReference = 23;
+  optional string receiverName = 24;
+  optional string source = 25;
+}
+
+message CreateEnquiryResponse {
+  string id = 1;
+}
+
+service EnquiriesService {
+  rpc createEnquiry (CreateEnquiryRequest) returns (CreateEnquiryResponse) {}
+}

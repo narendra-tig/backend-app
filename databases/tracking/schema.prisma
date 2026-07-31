@@ -32,10 +32,12 @@ model TrackingEvent {
   packageRef      String?  @db.Text
   consignment     String?  @db.Text
   trackingEventId String   @db.Uuid
+  replayKey       String   @unique @db.Text
   createdAt       DateTime @default(now()) @db.Timestamptz()
   updatedAt       DateTime @updatedAt
   tenantId        String   @db.Uuid
 
   shipmentId String   @db.Uuid
   Shipment   Shipment @relation(fields: [shipmentId], references: [shipmentId], onDelete: Cascade)
+
 }

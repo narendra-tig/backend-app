@@ -11,7 +11,7 @@ export class DocumentsPrismaService
     const connectionString = process.env.DOCUMENTS_DATABASE_URL;
 
     if (!connectionString) {
-      throw new Error('DATABASE_URL is not defined');
+      throw new Error('DOCUMENTS_DATABASE_URL is not defined');
     }
 
     const isPrismaUrl = /^prisma(?:\+postgres)?:\/\//.test(connectionString);
