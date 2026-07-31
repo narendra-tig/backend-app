@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { AccountsPrismaService } from '../prisma/accounts-prisma.service';
 
@@ -6,11 +7,21 @@ import { AccountsPrismaService } from '../prisma/accounts-prisma.service';
 export class AccountsService {
   constructor(private readonly accountsPrismaService: AccountsPrismaService) {}
 
-  // async create(createAccountDto: CreateAccountDto) {
-  //   return await this.accountsPrismaService.account.create({
-  //     data: createAccountDto,
-  //   });
-  // }
+  async create(createAccountDto: CreateAccountDto) {
+    const { name, tenantId, displayName, ofTenancy, standing, grade } =
+      createAccountDto;
+
+    return this.accountsPrismaService.account.create({
+      data: {
+        name,
+        tenantId,
+        displayName,
+        ofTenancy,
+        standing,
+        grade,
+      },
+    });
+  }
 
   async findAll(tenantId: string) {
     return await this.accountsPrismaService.account.findMany({
