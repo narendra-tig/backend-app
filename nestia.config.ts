@@ -4,7 +4,7 @@ export const NESTIA_CONFIG: INestiaConfig = {
   input: 'src/**/*.controller.ts',
   output: './api',
   clone: true,
-  //   distribute: 'packages/open360-api',
+  distribute: 'packages/open360-api',
   e2e: 'test',
 };
 
